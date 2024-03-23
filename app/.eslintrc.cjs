@@ -8,7 +8,7 @@ module.exports = {
   ],
   ignorePatterns: ["dist", ".eslintrc.cjs", "__generated__", "routeTree.gen.ts"],
   parser: "@typescript-eslint/parser",
-  plugins: ["react-refresh"],
+  plugins: ["react-refresh","jest-dom"],
   rules: {
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     "@typescript-eslint/no-unused-vars": "off",
