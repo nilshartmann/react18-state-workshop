@@ -1,9 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import { createPostsData } from "./post-data";
 import { createCommentsData } from "./comments-data";
+import {createUserData} from "./user-data";
 
 let posts = createPostsData();
 let comments = createCommentsData();
+let users = createUserData();
 
 type SortableByDate = {
   date: string;
@@ -224,6 +226,18 @@ app.post("/posts", (req, res) => {
   res.status(201).json({ newPost });
 });
 
+app.get("/users/:userId", (req, res) =>{
+  const userId = req.params.userId;
+  const user = users[userId];
+  if (!user) {
+    return res.status(404).json({
+      error: `User '${userId}' not found.`
+    })
+  }
+
+  res.status(200).json({user});
+})
+
 app.listen(port, () => {
   console.log(`
     📞    Blog API Server listening on port ${port}
@@ -232,6 +246,7 @@ app.listen(port, () => {
     👉    Try http://localhost:${port}/posts/3/comments
     👉    Try http://localhost:${port}/posts?teaser
     👉    Try http://localhost:${port}/posts?teaser&filter=redux
+    👉    Try http://localhost:${port}/users/U1
     👉    Try "http POST http://localhost:7002/posts title=hallo body=welt"
     👉    Try "http POST http://localhost:7002/posts/1/comments comment=moin"
     😴    Simulate slowness: http://localhost:${port}/posts?slowDown=2400`);
