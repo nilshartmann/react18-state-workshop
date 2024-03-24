@@ -10,7 +10,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "@epic-web/invariant": "1.0.0",
@@ -28,6 +28,7 @@
     "zustand": "4.5.2"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@tanstack/eslint-plugin-query": "5.18.1",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.2",
