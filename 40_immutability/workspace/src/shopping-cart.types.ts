@@ -1,9 +1,9 @@
-export type ShoppingCartItem = {
+export type IShoppingCartItem = {
   productId: string;
   quantity: number;
 };
 
-export type ShoppingCart = {
+export type IShoppingCart = {
   username: string;
-  items: ShoppingCartItem[];
+  items: IShoppingCartItem[];
 };

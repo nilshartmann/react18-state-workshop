@@ -26,14 +26,14 @@
 //       - ansonsten soll die Quantity im bestehenden Produkt aktualisiert werden
 //
 
-import { ShoppingCart } from "./shopping-cart.types.ts";
+import { IShoppingCart } from "./shopping-cart.types.ts";
 import { produce } from "immer";
 
 export function updateShoppingCartImmer(
-  cart: ShoppingCart,
+  cart: IShoppingCart,
   productId: string,
   amount: number,
-): ShoppingCart {
+): IShoppingCart {
   // todo!
   return cart;
 }

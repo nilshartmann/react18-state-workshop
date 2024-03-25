@@ -1,15 +1,6 @@
 import Container from "./Container.tsx";
 import { useState } from "react";
-
-export type IShoppingCartItem = {
-  productId: string;
-  quantity: number;
-};
-
-export type IShoppingCart = {
-  username: string;
-  items: IShoppingCartItem[];
-};
+import { IShoppingCart, IShoppingCartItem } from "./shopping-cart.types.ts";
 
 function createCart(): IShoppingCart {
   return {
@@ -25,9 +16,7 @@ export default function ShoppingCartApp() {
   const [myShoppingCart, setMyShoppingCart] = useState(createCart);
 
   const handleIncreaseClick = (pId: string) => {
-    const copyItem = (
-      item: IShoppingCartItem,
-    ): IShoppingCartItem => {
+    const copyItem = (item: IShoppingCartItem): IShoppingCartItem => {
       return {
         productId: item.productId,
         quantity: item.productId === pId ? item.quantity + 1 : item.quantity,

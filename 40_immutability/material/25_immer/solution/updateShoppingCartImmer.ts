@@ -34,14 +34,14 @@
 //
 //
 
-import { ShoppingCart } from "./shopping-cart.types.ts";
+import { IShoppingCart } from "./shopping-cart.types.ts";
 import { produce } from "immer";
 
 export function updateShoppingCartImmer(
-  cart: ShoppingCart,
+  cart: IShoppingCart,
   productId: string,
   amount: number,
-): ShoppingCart {
+): IShoppingCart {
   return produce(cart, (draft) => {
     if (amount === 0) {
       return;

@@ -1,7 +1,7 @@
 import { updateShoppingCart } from "../updateShoppingCart.ts";
-import { ShoppingCart } from "../shopping-cart.types.ts";
+import { IShoppingCart } from "../shopping-cart.types.ts";
 
-function createCart(): ShoppingCart {
+function createCart(): IShoppingCart {
   return {
     username: "Klaus",
     items: [

@@ -36,13 +36,13 @@
 //
 //
 
-import { ShoppingCart } from "./shopping-cart.types.ts";
+import { IShoppingCart } from "./shopping-cart.types.ts";
 
 export function updateShoppingCart(
-  cart: ShoppingCart,
+  cart: IShoppingCart,
   productId: string,
   amount: number,
-): ShoppingCart {
+): IShoppingCart {
   // todo!
   return cart;
 }
