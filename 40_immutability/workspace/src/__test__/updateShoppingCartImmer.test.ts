@@ -1,5 +1,5 @@
-import { ShoppingCart } from "./shopping-cart.types.ts";
-import { updateShoppingCartImmer } from "./updateShoppingCartImmer.ts";
+import { ShoppingCart } from "../shopping-cart.types.ts";
+import { updateShoppingCartImmer } from "../updateShoppingCartImmer.ts";
 
 function createCart(): ShoppingCart {
   return {

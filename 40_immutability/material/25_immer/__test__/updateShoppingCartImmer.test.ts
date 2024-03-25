@@ -1,5 +1,5 @@
-import { updateShoppingCart } from "./updateShoppingCart.ts";
-import { ShoppingCart } from "./shopping-cart.types.ts";
+import { ShoppingCart } from "../shopping-cart.types.ts";
+import { updateShoppingCartImmer } from "../updateShoppingCartImmer.ts";
 
 function createCart(): ShoppingCart {
   return {
@@ -14,7 +14,7 @@ function createCart(): ShoppingCart {
 it("should add new item", () => {
   const cart = createCart();
 
-  const newCart = updateShoppingCart(cart, "P3", 3);
+  const newCart = updateShoppingCartImmer(cart, "P3", 3);
   expect(newCart).not.toBe(cart);
   expect(newCart.username).toBe(cart.username); // should not be changed
   expect(newCart.items).not.toBe(cart.items); // original items must NOT be changed
@@ -29,7 +29,7 @@ it("should add new item", () => {
 it("should change quantity item if amount is positive", () => {
   const cart = createCart();
 
-  const newCart = updateShoppingCart(cart, "P1", 3);
+  const newCart = updateShoppingCartImmer(cart, "P1", 3);
   expect(newCart).not.toBe(cart);
   expect(newCart.username).toBe(cart.username); // should not be changed
   expect(newCart.items).not.toBe(cart.items); // original items must NOT be changed
@@ -44,7 +44,7 @@ it("should change quantity item if amount is positive", () => {
 it("should change quantity item if amount is negative", () => {
   const cart = createCart();
 
-  const newCart = updateShoppingCart(cart, "P1", -1);
+  const newCart = updateShoppingCartImmer(cart, "P1", -1);
   expect(newCart).not.toBe(cart);
   expect(newCart.username).toBe(cart.username); // should not be changed
   expect(newCart.items).not.toBe(cart.items); // original items must NOT be changed
@@ -59,7 +59,7 @@ it("should change quantity item if amount is negative", () => {
 it("should remove item from quatity if new quantity is less than one", () => {
   const cart = createCart();
 
-  const newCart = updateShoppingCart(cart, "P1", -2);
+  const newCart = updateShoppingCartImmer(cart, "P1", -2);
   expect(newCart).not.toBe(cart);
   expect(newCart.username).toBe(cart.username); // should not be changed
   expect(newCart.items).not.toBe(cart.items); // original items must NOT be changed
@@ -70,7 +70,7 @@ it("should remove item from quatity if new quantity is less than one", () => {
 it("should not change cart if amount is less than 1", () => {
   const cart = createCart();
 
-  const newCart = updateShoppingCart(cart, "P3", -1); // P2 not in cart
+  const newCart = updateShoppingCartImmer(cart, "P3", -1); // P2 not in cart
   expect(newCart).toBe(cart);
   expect(newCart.items).toBe(cart.items);
   expect(newCart.items[0]).toBe(cart.items[0]); // must NOT be changed
@@ -81,7 +81,7 @@ it("should not change cart if amount is less than 1", () => {
 it("should not change cart if amount is 0 for existing product", () => {
   const cart = createCart();
 
-  const newCart = updateShoppingCart(cart, "P1", 0);
+  const newCart = updateShoppingCartImmer(cart, "P1", 0);
   expect(newCart).toBe(cart);
   expect(newCart.items).toBe(cart.items);
   expect(newCart.items[0]).toBe(cart.items[0]); // must NOT be changed
