@@ -99,7 +99,7 @@ app.get("/posts/:postId", (req: Request, res: Response) => {
     });
   }
 
-  return res.status(200).json({ post });
+  return res.status(200).json( post );
 });
 
 app.get("/posts/:postId/comments", (req: Request, res: Response) => {
@@ -112,7 +112,32 @@ app.get("/posts/:postId/comments", (req: Request, res: Response) => {
   }
 
   const commentsForPost = comments.filter(c => c.postId === postId);
-  return res.json({ comments: commentsForPost });
+  return res.json( commentsForPost );
+});
+
+app.post("/posts/:postId/like", (req, res) => {
+  const postId = req.params["postId"];
+
+  const post = posts.find(p => p.id === postId);
+
+  if (!post) {
+    return res.status(404).json({ error: `Post '${req.params.postId}' not found` });
+  }
+
+  if (post.id === "P9") {
+    // simluation: error in processing
+    return res.status(200).json({
+      postId: post.id,
+      likes: "nobody likes me"
+    });
+  }
+
+  post.likes = post.likes + 1;
+
+  res.status(200).json({
+    postId: post.id,
+    likes: post.likes
+  });
 });
 
 function findNewestCommentForPost(postId: string) {
@@ -141,7 +166,7 @@ app.get("/posts", (req, res) => {
       id: p.id,
       date: p.date,
       title: p.title,
-      bodyMarkdown: p.bodyMarkdown
+      body: p.body
     }));
   }
 
@@ -154,7 +179,7 @@ app.get("/posts", (req, res) => {
       p =>
         p.title.toLowerCase().includes(filter) ||
         p.teaser.toLowerCase().includes(filter) ||
-        p.bodyMarkdown.toLowerCase().includes(filter)
+        p.body.toLowerCase().includes(filter)
     );
   }
 
@@ -164,7 +189,7 @@ app.get("/posts", (req, res) => {
     result.sort(orderByDateNewestFirst);
   }
 
-  res.status(200).json({ posts: result });
+  res.status(200).json(result);
 });
 
 app.post("/posts/:postId/comments", (req, res) => {
@@ -190,7 +215,7 @@ app.post("/posts/:postId/comments", (req, res) => {
 
   comments = [...comments, newComment];
 
-  res.status(201).json({ newComment });
+  res.status(201).json( newComment );
 });
 
 app.post("/posts", (req, res) => {
@@ -215,15 +240,16 @@ app.post("/posts", (req, res) => {
     user_id: "",
     title: post.title,
     teaser: post.body.length > 120 ? post.body.substring(0, 120) + "..." : post.body,
-    bodyMarkdown: post.body,
+    body: post.body,
     date: new Date().toISOString(),
     id: `P${posts.length + 1}`,
+    likes: 0,
     tags: ""
   };
 
   posts = [...posts, newPost];
 
-  res.status(201).json({ newPost });
+  res.status(201).json(newPost );
 });
 
 app.get("/users/:userId", (req, res) =>{
@@ -235,19 +261,19 @@ app.get("/users/:userId", (req, res) =>{
     })
   }
 
-  res.status(200).json({user});
+  res.status(200).json(user);
 })
 
 app.listen(port, () => {
   console.log(`
     📞    Blog API Server listening on port ${port}
     👉    Try http://localhost:${port}/posts
-    👉    Try http://localhost:${port}/posts/1
-    👉    Try http://localhost:${port}/posts/3/comments
+    👉    Try http://localhost:${port}/posts/P1
+    👉    Try http://localhost:${port}/posts/P3/comments
     👉    Try http://localhost:${port}/posts?teaser
     👉    Try http://localhost:${port}/posts?teaser&filter=redux
     👉    Try http://localhost:${port}/users/U1
     👉    Try "http POST http://localhost:7002/posts title=hallo body=welt"
-    👉    Try "http POST http://localhost:7002/posts/1/comments comment=moin"
+    👉    Try "http POST http://localhost:7002/posts/P1/comments comment=moin"
     😴    Simulate slowness: http://localhost:${port}/posts?slowDown=2400`);
 });
