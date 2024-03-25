@@ -1,0 +1,16 @@
+pnpm-lock.yaml
+
+# Assets
+public/assets
+dist/
+
+tsconfig.json
+.eslintrc.cjs
+index.html
+
+public/assets/
+
+src/__generated__/**
+src/routeTree.gen.ts
+postcss.config.js
+README.md
