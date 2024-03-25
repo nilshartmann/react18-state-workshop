@@ -1,4 +1,6 @@
 import { IShoppingCartItem } from "../shopping-cart.types.ts";
+import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
 
 type ShoppingCartStore = {
   items: IShoppingCartItem[];
@@ -34,4 +36,43 @@ const initialItems: IShoppingCartItem[] = [
 //       Store verwenden.
 //       - Weitere TODOs findest Du dort
 
-export const useShoppingCartStore = {}
+export const useShoppingCartStore = create<ShoppingCartStore>()(
+  immer((set, get) => ({
+    items: initialItems,
+    addItem(productId: string) {
+      get().updateItemQuantity(productId, 1);
+    },
+    updateItemQuantity(productId: string, amount: number) {
+      // draft is now  WritableDraft thanks to immer middleware
+      set((draft) => {
+        if (amount === 0) {
+          return;
+        }
+
+        const existingItem = draft.items.find((p) => p.productId === productId);
+        if (!existingItem) {
+          if (amount < 1) {
+            // item is not present, amount is < 1 => nothing to do
+            return;
+          }
+
+          draft.items.push({
+            productId,
+            quantity: amount,
+          });
+          return;
+        }
+
+        // item is present
+        const newQuantity = existingItem.quantity + amount;
+        if (newQuantity < 1) {
+          const ix = draft.items.findIndex((p) => p.productId === productId);
+          draft.items.splice(ix, 1);
+          return;
+        }
+
+        existingItem.quantity = newQuantity;
+      });
+    },
+  })),
+);
