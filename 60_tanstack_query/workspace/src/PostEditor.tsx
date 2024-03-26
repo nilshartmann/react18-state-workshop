@@ -1,38 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { BlogPost, NewBlogPost } from "./types";
-
-async function savePost(post: NewBlogPost): Promise<BlogPost> {
-  const response = await fetch("http://localhost:7000/posts", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(post)
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error);
-  }
-
-  return data;
-}
+import { useSaveBlogPostMutation } from "./use-save-post-mutation.ts";
 
 export default function PostEditor() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const saveMutation = useSaveBlogPostMutation();
 
   const [title, setTitle] = React.useState("");
   const [body, setBody] = React.useState("");
-
-  const saveMutation = useMutation({
-    mutationKey: ["new-post"],
-    mutationFn: savePost,
-    onSuccess: () => queryClient.removeQueries({ queryKey: ["posts"] })
-  });
 
   async function handleSave() {
     const newPost = { title, body };
@@ -52,7 +27,7 @@ export default function PostEditor() {
         Title
         <input
           value={title}
-          onChange={e => {
+          onChange={(e) => {
             saveMutation.reset();
             setTitle(e.currentTarget.value);
           }}
@@ -68,7 +43,7 @@ export default function PostEditor() {
         Body
         <textarea
           value={body}
-          onChange={e => {
+          onChange={(e) => {
             saveMutation.reset();
             setBody(e.currentTarget.value);
           }}
@@ -93,7 +68,9 @@ export default function PostEditor() {
         Save Post
       </button>
       <button onClick={() => navigate("/")}>Close</button>
-      {saveMutation.isError && <p>Fehler beim Speichern des Posts: {String(saveMutation.error)}</p>}
+      {saveMutation.isError && (
+        <p>Fehler beim Speichern des Posts: {String(saveMutation.error)}</p>
+      )}
     </div>
   );
 }
@@ -105,7 +82,9 @@ type MessageProps = {
 
 function Message({ msg, type = "error" }: MessageProps) {
   const style: React.CSSProperties =
-    type === "error" ? { color: "red", fontWeight: "bold" } : { color: "green" };
+    type === "error"
+      ? { color: "red", fontWeight: "bold" }
+      : { color: "green" };
 
   return <p style={style}>{msg}</p>;
 }
