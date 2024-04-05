@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import NotificationApp from "./NotificationApp.tsx";
+import PostEditor from "./PostEditor.tsx";
 
 // Hier gibt es drei Apps:
 // - CounterApp fuer Live-Coding-Beispiel
@@ -8,5 +9,5 @@ import NotificationApp from "./NotificationApp.tsx";
 // - je nach Bedarf 'render' anpassen:
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <NotificationApp />,
+  <PostEditor onSavePost={() => {}} />,
 );

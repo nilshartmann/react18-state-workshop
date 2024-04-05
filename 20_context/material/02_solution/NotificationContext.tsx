@@ -94,8 +94,8 @@ export default function NotificationContextProvider({
 }
 
 export function useNotificationContext(): INotificationContext {
-  // Implementiere diesen Custom Hook
-  //   Dieser soll
+  // Implementiere diesen Custom Hook, so dass dieser in jedem Fall einen INotificationContext
+  // zurückliefert (oder throw new Error("..."), falls kein Context gesetzt ist)
   const ctx = useContext(NotificationContext);
 
   invariant(

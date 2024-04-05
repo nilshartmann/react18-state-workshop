@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -6,17 +6,26 @@
     <title>React Vertiefung</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"
     />
     <link rel="stylesheet" href="slides/revealjs/reveal.js/dist/reset.css" />
     <link rel="stylesheet" href="slides/revealjs/reveal.js/dist/reveal.css" />
-    <link rel="stylesheet" href="slides/revealjs/reveal.js/dist/theme/solarized.css" />
+    <link
+      rel="stylesheet"
+      href="slides/revealjs/reveal.js/dist/theme/solarized.css"
+    />
 
     <!-- Theme used for syntax hislides/ghlighted code -->
-    <link rel="stylesheet" href="slides/revealjs/highlight-js-github-theme.css" />
+    <link
+      rel="stylesheet"
+      href="slides/revealjs/highlight-js-github-theme.css"
+    />
     <link rel="stylesheet" href="slides/revealjs/styles.css" />
   </head>
 
@@ -31,9 +40,13 @@
 
           <h4>
             <span class="transparent-bg">
-              <a href="https://nilshartmann.net" target="_blank">Nils Hartmann</a>
+              <a href="https://nilshartmann.net" target="_blank"
+                >Nils Hartmann</a
+              >
               |
-              <a href="https://twitter.com/nilshartmann" target="_blank">@nilshartmann</a>
+              <a href="https://twitter.com/nilshartmann" target="_blank"
+                >@nilshartmann</a
+              >
             </span>
           </h4>
           <p style="margin-top: 4rem"></p>
@@ -52,7 +65,9 @@
           <div>
             <h3><span class="transparent-bg">Slides</span></h3>
             <p>
-              <span class="transparent-bg">Lokal: 2024-04-08-react-advanced.html</span>
+              <span class="transparent-bg"
+                >Lokal: 2024-04-08-react-advanced.html</span
+              >
             </p>
             <p>
               <span class="transparent-bg"
@@ -68,12 +83,19 @@
         <section>
           <h2>Nils Hartmann</h2>
           <p>
-            <a href="https://nilshartmann.net" target="_blank">https://nilshartmann.net</a>
+            <a href="https://nilshartmann.net" target="_blank"
+              >https://nilshartmann.net</a
+            >
             /
-            <a href="https://twitter.com/nilshartmann" target="_blank">@nilshartmann</a>
+            <a href="https://twitter.com/nilshartmann" target="_blank"
+              >@nilshartmann</a
+            >
           </p>
           <p>
-            <em>Freiberuflicher Software-Entwickler, Berater und Trainer aus Hamburg</em>
+            <em
+              >Freiberuflicher Software-Entwickler, Berater und Trainer aus
+              Hamburg</em
+            >
           </p>
 
           <div style="display: flex; justify-content: center">
@@ -84,7 +106,9 @@
               <p>Single-Page-Applications</p>
               <p>GraphQL</p>
               <p style="margin-top: 20px">
-                <a href="https://nilshartmann.net/workshops">Schulungen und Workshops</a>
+                <a href="https://nilshartmann.net/workshops"
+                  >Schulungen und Workshops</a
+                >
               </p>
             </div>
             <div style="margin-left: 15px">
@@ -136,18 +160,21 @@
           <h3>Hintergrund: Globaler Zustand</h3>
           <ul>
             <li>
-              Man kann Zustand in <b>lokalen Zustand</b> und <b>globalen Zustand</b> einteilen
+              Man kann Zustand in <b>lokalen Zustand</b> und
+              <b>globalen Zustand</b> einteilen
             </li>
             <li>
-              <b>Lokaler Zustand</b> ist Zustand, der "mehr oder weniger" einer Komponente zur
-              Verfügung steht
+              <b>Lokaler Zustand</b> ist Zustand, der "mehr oder weniger" einer
+              Komponente zur Verfügung steht
             </li>
             <li>
-              <b>Globaler Zustand</b> hingegen ist für die ganze Anwendung oder große Teile davon
-              zuständig
+              <b>Globaler Zustand</b> hingegen ist für die ganze Anwendung oder
+              große Teile davon zuständig
             </li>
             <li>Die Übgergänge sind fließend, es gibt keine fixe Definition</li>
-            <li>Beispiele für globalen Zustand: angemeldeter Benutzer, Theme</li>
+            <li>
+              Beispiele für globalen Zustand: angemeldeter Benutzer, Theme
+            </li>
           </ul>
         </section>
         <section>
@@ -169,27 +196,34 @@
           </p>
           <p><code>CounterApp</code> rendern!</p>
           <p>
-            In <code>Container.tsx</code> Anzeige der Renderings einschalten (<code
-              >showRenderings = true</code
-            >)
+            In <code>Container.tsx</code> Anzeige der Renderings einschalten
+            (<code>showRenderings = true</code>)
           </p>
-          <p>(Material in <code>context-example/material/CounterContext.txt</code>)</p>
+          <p>
+            (Material in
+            <code>context-example/material/CounterContext.txt</code>)
+          </p>
         </section>
 
         <section>
           <h2>Context...</h2>
           <p>
             <em
-              >erlaubt das Durchreichen von Informationen ohne explizites angeben als Properties</em
+              >erlaubt das Durchreichen von Informationen ohne explizites
+              angeben als Properties</em
             >
           </p>
 
           <ul>
             <li>funktioniert nur innerhalb einer Hierarchie-Ebene</li>
-            <li>es können beliebg viele (fachliche) Context definiert werden</li>
+            <li>
+              es können beliebg viele (fachliche) Context definiert werden
+            </li>
             <li>besteht aus <code>Provider</code> und <code>Consumer</code></li>
             <li>
-              <a href="https://reactjs.org/docs/context.html" target="_blank">Doku</a>
+              <a href="https://reactjs.org/docs/context.html" target="_blank"
+                >Doku</a
+              >
             </li>
           </ul>
         </section>
@@ -201,12 +235,12 @@
               <em>erzeugt ein Objekt, mit <b>zwei Komponenten</b></em>
             </li>
             <li>
-              <code>Provider</code>, stellt Objekt mit Key-Value-Paaren zur Verfügung (der
-              Context-"Value")
+              <code>Provider</code>, stellt Objekt mit Key-Value-Paaren zur
+              Verfügung (der Context-"Value")
             </li>
             <li>
-              <code>Consumer</code> wird in eigener Komponente verwendet, um auf einen Context
-              zuzugreifen ("versteckt" durch useContext Hook)
+              <code>Consumer</code> wird in eigener Komponente verwendet, um auf
+              einen Context zuzugreifen ("versteckt" durch useContext Hook)
             </li>
             <li>
               <pre><code class="line-numbers" data-leftpad>
@@ -310,7 +344,10 @@ function UserBadge() {
 
           <p>Aufrufen einer Funktion aus dem Context</p>
           <p>Ändert im Context den Zustand der Provider-Komponente</p>
-          <p>Alle Konsumer werden neu gerendert und können den neuen Wert verwenden</p>
+          <p>
+            Alle Konsumer werden neu gerendert und können den neuen Wert
+            verwenden
+          </p>
           <pre><code class="javascript">
 function UserBadge() {
   const { currentUser, logout } = React.useContext(AuthContext);
@@ -418,63 +455,45 @@ function UserBadge() {
   ```
 
 ---
-## Übung: Ein Formular-Context
+## Übung: Ein Notification Context
 
-* *Baue einen Kontext, der Daten eines Formulars hält und diese verändern kann*
+* *Baue einen Kontext, der eine globale Notification anzeigt*
+* <!-- .element: class="demo" -->Ergebnis zeigen
 * Schritte:
-  * In `context-example/context-workspace` bitte Abhängigkeiten installieren und npm starten:
+  * In `20_context/workspace` bitte Abhängigkeiten installieren und npm starten:
   * ```bash
-    cd context-example/context-workspace
+    cd 20_context/workspace
 
     npm install
     npm start 
     ```
-  
-* In der `App.tsx`-Datei ist ein Formular implementiert (ohne Kontext).
-* Die Formulardaten und Callback-Funktionen sollen in einen Kontext.
-* Nähere Informationen findest Du direkt in der Datei.
-* Mögliche Lösung findest Du in `steps/10_PersonForm_mit_context.tsx`
-* Wenn Du fertig bist, bitte "Hand heben" in Zoom 🙋‍♀️
+* In `NotificationContext.tsx` soll ein Context implementiert werden, der Informationen
+            über die anzuzeigene Notification enthält
+* In `NotificationApp.tsx` sind React-Komponenten implementiert. Diese sollen den Context dann nutzen
+* Nähere Informationen findest Du direkt in beiden Dateien
+* Du solltest mit der Implementierung des `NotificationContext` anfangen
+* Mögliche Lösung findest Du in `material/02_solution`
+* Wenn Du fertig bist, bitte "Hand heben" in Zoom 🙋️
 
 ---
-### Formular-Beispiel: was gäbe es für eine Alternative?
+### Renderverhalten von Context
 
-* Wenn wir _keinen_ Kontext haben wollen, aber ein wiederverwendbares Formular "Framework"? 🤔
+* Lasst uns mal überlegen, ob es sinnvoll ist, für die Verwendung unseres `NotificationContext` mehrere Hooks zu bauen:
+  * zum Beispiel zum Setzen des Context
+  * zum Beispiel zum Zugriff nur auf die übersetzte Message
+  * ...oder auch nur auf die Information, ob überhaupt etwas gesetzt ist
+* hilft uns das beim Optimieren des Renderings? 🤔
+* was für einen Vor- oder Nachteil hätte dieser Ansatz darüberhinaus? 🤔
+---
+### Renderverhalten von Context
 
-* Man könnte `formState` und die Funktionen zum Ändern in einen Custom Hook packen
-* ```typescript
-    function useForm() {
-      const [formState, setFormState] = React.useState<FormState>({});
+* Bei jeglicher Änderung des Contexts werden immer alle Konsumenten neu gerendert
+  * unabhängig davon, ob diese sich für den Teil interessieren, der sich geändert hat
+  * das können wir nicht vermeiden (evtl. in einer kommenden React Version)
+* Aus diesem Grund sollte man den Context nicht unbedingt verwenden, wenn
+  * darin Daten enthalten sind die sich häufig bzw. schnell ändern (Inhalt eines Eingabefeldes z.B.)
+  * und von diesen Änderungen sehr viele Komponenten betroffen sind (direkt oder indirekt)
 
-      function onClearForm() {
-        setFormState({});
-      }
-
-      function onFieldChange(fieldname: string, value: string) {
-        setFormState({
-          ...formState,
-          [fieldname]: value
-        });
-      }
-
-      return { formState, onClearForm, onFieldChange };
-    }
-
-    function PersonForm() {
-      const { formState, setFormState, onFieldChange } = useForm();
-
-      return (
-        <div>
-          <FieldSet>
-            <Input name="firstname" formState={formState} onFieldChange={onFieldChange} />
-            <Input name="lastname" formState={formState} onFieldChange={onFieldChange} />
-          </FieldSet>
-          <ClearButton onClearForm={onClearForm} />
-        </div>
-      );
-    }  
-  ```
-* Vorteile? Nachteile? 🤔
 
 ---
 ### Neuerungen in React 19
@@ -490,260 +509,679 @@ function UserBadge() {
 * Die APIs `useCallback`, `useMemo` und `memo` werden durch den **React Compiler** (ehem. Codename: "Forget") ersetzt
   * Unklar, ob der Compiler Teil von React 19 wird, da es ein eigenes Projekt ist
 
----
-### Renderverhalten von Context
-<!-- .element: class="todo" -->Beispiel aus Februar-Schulung übernehmen
-<!-- .slide: id="t-context-render" --> 
-* <!-- .element: class="demo" --> Eine Komponente in den Kontext (`CounterContext`) hinzufügen
-* <!-- .element: class="demo" --> Was passiert und warum? 🤔
 
----
-### Renderverhalten von Context
-* Die `children` werden fertig übergeben
-* Deren Renderzyklus wird von der Komponente bestimmt, die die `children` erzeugt
-  * Das ist hier der Aufrufer von `Form`
 
-* ```typescript
-    function Form({ children }: FormProps) {
-      // ...
-      return (
-        <Container title="Form">
-          <FormContext.Provider
-            value={ /* ... */ }
-          >
-            {children}
-          </FormContext.Provider>
-        </Container>
-      );
-    }  
+          </textarea>
+        </section>
+        <section data-transition="slide none">
+          <h2>Was testen wir?</h2>
+          <ul>
+            <li>
+              <b>UI-unabhängige Logik</b> (zum Beispiel Backend Calls,
+              Berechnungen etc.)
+            </li>
+            <li>
+              <b>Rendering</b> (Ist die Liste der Blog Posts korrekt? Sieht das
+              Markup aus, wie wir uns das vorstellen?) und
+              <b>Interaktionen</b> (funktionieren die Event Handler, die
+              Callback-Funktionen, der Programmfluß etc.?)
+            </li>
+            <li>
+              <b>Verhalten im Browser</b> (z.B. korrekte, pixelgenaue
+              Darstellung, Browser-spezifisches JavaScript, Arbeiten mit
+              Browser-Technologie wie Titelzeile, Session Storage, Scrollbars
+              etc)
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h1>Jest</h1>
+          <p>
+            <em
+              >"Delightful JavaScript Testing" (
+              <a href="https://jestjs.io/" target="_blank">https://jestjs.io/</a
+              >)</em
+            >
+          </p>
+          <p>Vollständige Testlösung für React (und andere):</p>
+          <ul>
+            <li>Test Runner</li>
+            <li>Specs/Assertions, Mocks</li>
+            <li>Code Coverage</li>
+          </ul>
+        </section>
+        <section>
+          <h1>Vitest</h1>
+          <p class="fragment">
+            Falls ihr mit Vite arbeitet, bietet sich
+            <a href="https://vitest.dev/"> Vitest </a> an.
+          </p>
+          <ul>
+            <li>
+              Das ist deutlich moderner als Jest und arbeitet auch besser mit
+              dem ECMAScript Modulsystem (ESM) und TypeScript zusammen
+            </li>
+            <li>
+              Vitest hat eine sehr ähnliche API wie Jest und ein vergleichbares
+              Feature-Set
+            </li>
+            <li>
+              Es gibt auch einen<a
+                href="https://vitest.dev/guide/migration.html#migrating-from-jest"
+                >Migrationspfad von Jest</a
+              >
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h4>Jest</h4>
+          <h3>Beispiel: Ein einfacher Testfall</h3>
+          <pre><code class="javascript">// sum.js (or sum.ts)
+export const sum = (a,b) => a+b;
+        </code></pre>
+          <pre><code class="javascript">// sum.test.js
+import {sum} from '../sum.js';
+
+test('sum of 2 and 2 is 4', () => {
+  expect(sum(2, 2)).toBe(4);
+});
+
+test('sum of 2 and 2 is not 3', () => {
+  expect(sum(2, 2)).not.toBe(3);
+});
+            </code></pre>
+        </section>
+        <section>
+          <h4>Jest</h4>
+          <h2>Testcases</h2>
+          <p>
+            <code>test</code> oder
+            <code>it</code>
+          </p>
+          <pre><code>test('it should work', () => {
+  expect(...).toBe(...);
+});</code></pre>
+          <pre><code>it('it should also work', () => {
+  expect(...).toBe(...);
+});</code></pre>
+        </section>
+
+        <section>
+          <h4>Jest</h4>
+          <h2>"Expectations" und "Matchers"</h2>
+          <div>
+            <p>
+              <code>expect()</code> liefert ein <em>Expectation</em> Objekt
+              zurück, das verschiede <em>Matcher</em> Funktionen bereitstellt:
+            </p>
+            <pre><code>expect(actual).toXyz(expected);
+// for example:
+expect("Hello Jest").toBe("Hello Jest"); // => ok
+        </code></pre>
+          </div>
+          <div>
+            <p>Beispiele für Matchers</p>
+
+            <pre><code>// Compare identity
+expect(actual).toBe(expected);
+// Compare value:
+expect(actual).toEqual(expected);
+// true / false / null:
+expect(actual).toBeTruthy();
+expect(actual).toBeFalsy();
+expect(actual).toBeNull();
+// Length (Array oder String)
+expect(actual).toHaveLength(123);
+        </code></pre>
+          </div>
+          <p>
+            <a href="https://jestjs.io/docs/en/expect"
+              >https://jestjs.io/docs/en/expect</a
+            >
+          </p>
+        </section>
+
+        <section>
+          <h4>Jest</h4>
+          <h2>Mock Funktionen</h2>
+          <ul>
+            <li>
+              <code>jest.fn()</code> erzeugt eine Mock-Funktion
+              <pre><code>// Gibt undefined zurück, wenn die Mock-Funktion ausgeführt wird
+const aMockFn = jest.fn();
+
+const x = aMockFn("hello", "world"); // => undefined
+expect(x).toBeUndefined();
+              </code></pre>
+            </li>
+            <li>
+              Mit <code>toHaveBeenCalled</code>-Matcher-Funktionen kann geprüft
+              werden, ob der Mock aufgerufen wurde, wie häufig und mit welchen
+              Parametern:
+              <pre><code>
+expect(aMockFn).toHaveBeenCalled());  // Mock wurde aufgerufen (Parameter werden ignoriert)
+expect(aMockFn).toHaveBeenCalledWith("hello", "world")); // Mock wurde mit 'huhu' aufgerufen
+expect(aMockFn).toHaveBeenCalledTimes(1)); // Mock wurde genau einmal aufgerufen
+
+// Übergebene Paramter stehen über .mock.calls:
+expect(aMockFn.mock.calls[0][0]).toBe("hello");
+expect(aMockFn.mock.calls[0][1]).toBe("world");
+                      </code></pre>
+            </li>
+            <li>
+              Implementierung der Mock-Funktion kann als Parameter übergeben:
+              <pre><code>
+        const aMockFn = jest.fn( param => `Hello, ${param}` );
+
+        console.log(aMockFn('World'));
+        // => Hello, World
+                  </code></pre>
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h4>Jest</h4>
+          <p><b>Achtung:</b></p>
+          <p>
+            Je nach Jest-Version und Setup müsst ihr das
+            <code>jest</code>-Objekt importieren
+          </p>
+          <p><code>import { jest } from "@jest/globals";</code></p>
+          <p>
+            (Die <code>test</code>-Funktion funktioniert in der Regel ohne
+            import...)
+          </p>
+        </section>
+
+        <section>
+          <h3>Testen von React Komponenten</h3>
+        </section>
+
+        <section>
+          <h3>react-testing-library</h3>
+          <p>
+            <em
+              >"Simple and complete React DOM testing utilities that encourage
+              good testing practices."
+            </em>
+          </p>
+
+          <p>
+            <a
+              href="https://github.com/testing-library/react-testing-library"
+              target="_blank"
+              >https://github.com/testing-library/react-testing-library</a
+            >)
+          </p>
+          <p>
+            Philosophie: Tests werden aus User-Perspektive geschrieben. Das
+            bedeutet, um die zu testenden Elemente zu finden, suchst Du nach
+            Eigenschaften, nach denen auch ein User suchen würde (z.B. Labels,
+            Placeholder etc.)
+          </p>
+        </section>
+        <section>
+          <h3>react-testing-library</h3>
+          <p>Example</p>
+          <p>Demo: 20_context/workspace/src/__tests__/PostEditor.test.tsx</p>
+          <pre><code class="javascript">
+            import { render, screen } from "@testing-library/react";
+            import _userEvent from "@testing-library/user-event";
+            import { jest } from "@jest/globals";
+
+
+            it("invokes callback on button click", () => {
+              const user = _userEvent.setup();
+
+              const onAddPostFn = jest.fn();
+
+              // Render
+              render(&lt;PostList onAddPost={onAddPostFn} posts={mockPosts} />);
+
+              // search the button
+              const buttonElement = screen.getByRole("button", { name: "Add Post" });
+
+              // "click" the button
+              await user.click(buttonElement);
+
+              // make sure it has been invoked
+              expect(onAddPostFn).toHaveBeenCalled();
+            });
+
+            </code></pre>
+        </section>
+
+        <section>
+          <h3>React Testing Library im Detail</h3>
+        </section>
+
+        <section>
+          <h3>Die render-Funktion</h3>
+          <ul>
+            <li>
+              Die render-Function aus der react-testing-library wird im Test
+              verwendet, um eine React Komponente (ohne Browser) zu rendern
+            </li>
+            <li>
+              Genauso wie in der Anwendungen können Properties angegeben werden
+            </li>
+            <li>
+              <pre><code class="javascript">
+import { render } from "@testing-library/react";
+
+// Render a single component
+render(&lt;PostList onAddPost={onAddPostFn} posts={mockPosts} />);
+            </code></pre>
+            </li>
+            <li>
+              Dran denken, ggf. Contexte ebenfalls zu erzeugen, falls diese
+              benötigt werden (eigener Context, Router, MaterialUI, etc)!
+            </li>
+            <li>
+              <pre><code class="javascript">
+
+// Render with surrounding Redux Provider (or Router, your own Context etc.)
+render(
+  &lt;NotificationContextProvider>
+    &lt;PostEditor onSavePost={onSavePostFn}  />
+  &lt;/NotificationContextProvider>
+);
+            </code></pre>
+            </li>
+          </ul>
+        </section>
+
+        <!-- ######################################################################################### ########################## -->
+
+        <section>
+          <h3>query Funktionen</h3>
+          <p>
+            Um die gerenderten HTML-Elemente aus deiner Komponente zu überprüfen
+            und mit ihnen zu interagieren, musst Du sie ersteinmal finden 🤓
+          </p>
+          <p>
+            Auf dem globalen <b>screen</b> Objekt der Testing-Lib sind
+            verschiedene Funktionen definiert, mit denen Du nach Elementen
+            suchen kannst
+          </p>
+          <p>
+            Die query-Funktionen haben unterschiedliche <b>Suffixe</b>, die
+            beschreiben, <b>nach welchem Kriterium</b> Du suchst (nach Label,
+            nach aria-role, ...)
+          </p>
+          <p>
+            Die Funktionen haben außerdem jeweils einen <b>Präfix</b> (getBy,
+            queryBy etc) der beschreibt, die Art des Rückgabewerts der jeweilgen
+            Funktion (z.B. ob sie einen Error wirft oder null zurückgibt, wenn
+            das angefragte Element nicht gefunden wurde)
+          </p>
+          <p>
+            Mehr zu den query-Funktionen:
+            <a
+              target="_blank"
+              href="https://testing-library.com/docs/react-testing-library/cheatsheet#queries"
+              >React Testing Library Cheatsheet</a
+            >
+          </p>
+
+          <pre><code class="javascript">
+  // BEISPIELE:
+  import { screen } from "@testing-library/react";
+
+  // suche nach einem Button (Annahme: es gibt GENAU EINEN, ansonsten schlägt der Test fehl)
+  const buttonElement = screen.getByRole("button", { name: "Add Post" });
+
+  // suche nach einem Button (gibt null oder EINEN Button, wirft ansonst einen Fehler)
+  const buttonElement = screen.queryByRole("button", { name: "Add Post" });
+  // das verwendet man eigentlich nur, um zu testen, dass ein Element NICHT vorhanden ist:
+  expect(screen.queryByRole("button", { name: "Create Post" })).not.toBeInTheDocument();
+
+  // suche nach einem Button (gibt alle gefunden zurück oder ein leeres Array)
+  const buttonElement = screen.queryAllByRole("button", { name: "Add Post" });
+</code></pre>
+        </section>
+
+        <section>
+          <h3>Überprüfen von Elementen</h3>
+          <p>
+            Wenn Du dein gesuchtes Elemente gefunden hast, kannst Du es
+            überprüfen, ob es deinen Erwartungen entspricht (korrekte Attribute
+            gesetzt etc.)
+          </p>
+          <p>
+            Die Bibliothek
+            <a
+              href="https://github.com/testing-library/jest-dom"
+              target="_blank"
+              >jest-dom</a
+            >
+            fügt dazu DOM-spezifiche Matcher für Jest hinzu.
+          </p>
+
+          <pre><code class="javascript">
+  import { screen } from "@testing-library/react";
+
+  expect(screen.getByRole("button", { name: "Add Post" })).toBeInTheDocument();
+
+  // stellt sicher, dass das Element im DOM vorhanden ist (getBy-Query würde hier vielleicht mehr Sinn machen)
+  expect(buttonElement).toBeInTheDocument();
+
+  // sicherstellen, dass ein Eingabefeld einen erwarteten Wert hat
+  expect(titleInput).toHaveValue("Moin moin");
+
+  // sicherstellen, dass ein Button disabled ist
+  expect(okButton).toBeDisabled();
+</code></pre>
+          <p>
+            Alle Matcher sind auf der oben verlinkten GitHub Seite dokumentiert
+          </p>
+        </section>
+        <section>
+          <h3>Interaktionen</h3>
+          <p>
+            Du kannst mit den Elementen interagieren, in dem Du ihnen Events
+            sendest, genau wie es ein Browser tun würde
+          </p>
+          <p>
+            Es gibt eine weitere Bibliothek,
+            <a
+              href="https://github.com/testing-library/user-event"
+              target="_blank"
+            >
+              user-event</a
+            >, die dir dabei hilft, die Events zu erzeugen.
+          </p>
+
+          <pre><code class="javascript">
+            import userEvent from "@testing-library/user-event";
+            // Simuliert die Eingabe in ein Textfeld
+            userEvent.type(titleInput, "New Title");
+
+            // Simuliert den Klick auf einen Button
+            userEvent.click(clearButton);
+          </code></pre>
+          <p>
+            Achtung! In neueren Versionen (ab v14) der Bibliothek muss man erst
+            setup-Aufrufen.
+          </p>
+          <p>
+            Außerdem sind die Funktionen nun asynchron, so dass Du mit
+            <code>await</code> auf deren Beendigung warten musst!
+            <b>Das ist ganz wichtig!</b>
+          </p>
+          <pre><code class="javascript">
+            import _userEvent from "@testing-library/user-event";
+
+            test("...", async () => {
+              const userEvent = _userEvent.setup();
+              // Simuliert die Eingabe in ein Textfeld
+              await userEvent.type(titleInput, "New Title");
+
+              // Simuliert den Klick auf einen Button
+              await userEvent.click(clearButton);
+            })
+          </code></pre>
+          <p>Alle Events sind auf der GitHub Seite beschrieben (Link oben)</p>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+## Der Testing Playground
+
+* https://testing-playground.com/
+* Hier kann man HTML-Code reinkopieren, mit dem man dann Query-Funktionen ausprobieren kann
+* Dazu gibt es auch eine Browser-Erweiterung für [Chrome](https://chrome.google.com/webstore/detail/testing-playground/hejbmebodbijjdhflfknehhcgaklhano)
+* Mit `screen.logTestingPlaygroundURL()` kann man eine URL ausgeben lassen, die den im Test gerenderten HTML-Code direkt im Playground öffnet
+          </textarea>
+        </section>
+        <section data-markdown>
+          <textarea data-template>
+## Übung: Tests für den PostEditor
+
+* Im Workspace-Verzeichnis (`20_context/workspace`) gibt es einen PostEditor
+* Um den auszuprobieren kannst Du den in `main.tsx` rendern lassen (statt `NotificationApp`)
+* Für diesen PostEditor solltest Du einige Tests schreiben
+* Ein "Template" dafür ist bereits im `__tests__`-Ordner vorhanden
+* Ausführen kannst Du die Tests mit `npm test`
+  * Dieser Prozess läuft "ewig" und führt die Tests automatisch beim Speichern aus
+* Alternativ kannst Du die Tests auch in IDEA ausführen
+* Lösung: `material
+* Wenn Du fertig bist, bitte "Hand heben" 🙋‍
+          </textarea>
+        </section>
+
+        <section>
+          <h3>Testen von fetch-Aufrufen</h3>
+          <p>Herausforderungen:</p>
+          <ul>
+            <li>Asynchroner Code (nicht beschränkt auf fetch)</li>
+            <li>Server Zugriffe/Server Mocks</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Behandlung von asynchronem code</h3>
+        </section>
+
+        <section>
+          <h3>Testen von asynchronem Code</h3>
+          <p>
+            Beispiel: Die <b>App</b> Komponente lädt Daten,
+            <em>erst dann</em> stellt sie die PostList dar. Das Laden der Posts
+            ist asynchron.
+          </p>
+
+          <pre><code class="javascript">
+            it("should render posts read from backend", () => {
+              render(&lt;App />);
+
+              // Annahme: es gibt einen Artikel mit dem Title "Learning React"
+              const articleOne = screen.findByRole("heading", { name: "Learning React" });
+
+              expect(articleOne).toBeInTheDocument(); // THIS WON'T WORK!
+            });
+          </code></pre>
+          <p>
+            Wir können einen Test als async-funktion schreiben und darin mit
+            <b>await</b> auf ein Element warten
+          </p>
+          <pre><code class="javascript">
+            // Test-Funktion als async-Funktion (beachte 'async'):
+            it("should render posts read from backend", async () => {
+              render(&lt;App />);
+
+              // Beachte await hier:
+              const articleOne = await screen.findByRole("heading", { name: "Learning React" });
+
+              expect(articleOne).toBeInTheDocument(); // YIPPIE, WORKS
+            });
+          </code></pre>
+          <p>
+            Achtung! Ihr müsst <code>find</code> Query-Funktionen verwenden, da
+            die <code>get</code>-Funktionen davon ausgehen, dass ein Element
+            bereits vorhanden ist, und nicht noch darauf warten.
+          </p>
+        </section>
+
+        <!-- ============================================================================= -->
+        <section>
+          <h3>Testen von fetch</h3>
+          <p>Wie gesehen, können wir asynchronen Code testen</p>
+          <p>Wollen wir fetch-Aufrufe in unserem Code haben, den wir testen?</p>
+          <p>
+            Möglicherweise nicht, weil wir bei echten fetch-Aufrufen auch einen
+            echten, laufenden und funktionierenden Server im Test bräuchten
+          </p>
+          <p>Stattdessen wollen wir das "echte" fetch mocken</p>
+        </section>
+
+        <section>
+          <h3>Fetch mocken, Ansatz #1</h3>
+          <p>Wir können <b>komplette Module</b> in Jest mocken</p>
+          <p>
+            Wir könnten unseren fetch-Code in ein eigenes Modul schieben und das
+            dann mocken
+          </p>
+
+          <pre><code class="javascript">
+            // api.ts (fetch vereinfacht!)
+            export function readPosts() {
+              return fetch("http://localhost:7000/posts").then(response => response.json());
+            }
+          </code></pre>
+
+          <pre><code class="javascript">
+            // App.tsx:
+
+            import { readPosts } from "./api";
+            function App() {
+              // ...
+              React.useEffect(() => {
+                // Verwenden von readPosts hier:
+                readPosts()
+                  .then(json => {
+                    setLoading(false);
+                    setPosts(json);
+                  })
+                  .catch(err => console.error("Loading data failed: " + err));
+              }, []);
+            }
+          </code></pre>
+        </section>
+        <section>
+          <h3>Mocken von Modulen in Jest</h3>
+          <p>Es gibt mehrere Varianten. Das hier die einfachste(?)</p>
+
+          <pre><code class="javascript">
+            // App.test.tsx
+
+            const mockPosts = [
+              { id: "1", title: "One Fetch Mock", body: "Lorem ipsum" },
+              { id: "2", title: "Second Post Fetch Mock", body: "Some more content" }
+            ];
+
+            jest.mock("../api", () => ({
+              readPosts: () => Promise.resolve(mockPosts)
+            }));
+
+            it("should render posts read from backend", async () => {
+              render(&lt;App />);
+
+              // Hier immer noch asnychroner Code (deswegen await), aber:
+              // kein laufender Server mehr benötigt
+              const articleOne = await screen.findByRole("heading", { name: "One" });
+              expect(articleOne).toBeInTheDocument();
+
+              expect(screen.getByText("Second Post")).toBeInTheDocument();
+            });
+          </code></pre>
+          <p>
+            Beispiel:
+            <code
+              >blog-example/steps/6a-testing-with-api-module/src/__tests__/App_module_mock.test.tsx</code
+            >
+          </p>
+        </section>
+        <section>
+          <h3>Ansatz #2: fetch API mocken</h3>
+          <p>Es gibt mehrere Bibliothken mit fetch-Mocks</p>
+          <p>
+            Für mich funktioniert
+            <a
+              href="https://www.npmjs.com/package/jest-fetch-mock"
+              target="_blank"
+              >jest-fetch-mock</a
+            >
+            am Besten
+          </p>
+
+          <pre><code class="javascript">
+            // App.test.tsx
+            it("should render posts read from backend", async () => {
+              // setzen des Ergebnisses, das der nächste fetch-Aufruf zurückliefern soll
+              fetchMock.mockResponse(JSON.stringify(mockPosts));
+
+              render(&lt;App />);
+
+              // Immer noch asynchroner Code, aber kein "echter" fetch-Aufruf mehr,
+              // zurückgegeben wird das oben angegebene Ergebnis
+              const articleOne = await screen.findByRole("heading", { name: "One Fetch Mock" });
+
+              expect(articleOne).toBeInTheDocument();
+            });
+
+          </code></pre>
+          <p>
+            Beispiel:
+            <code
+              >blog-example/steps/6a-testing-with-api-module/src/__tests__/App_jest_mock.test.tsx</code
+            >
+          </p>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+### jest-fetch-mock
+
+* `fetchMock.mockResponse`: Ersetzt *alle* Aufrufe mit dem übergebenen Ergebnis
+* `fetchMock.mockResponseOnce`: Ersetzt nur den nächsten Aufruf mit dem übergebenen Ergebnis
+* `fetchMock.mockResponses`: Ersetzt die nächsten X Aufrufe mit den übergebenen Ergebnissen
+* Alle Funktionen haben dieselbe Signatur:
+  * Entweder ihr setzt direkt das Ergebnis, das zurückgeliefert werden soll
+  * Oder ihr gebt eine Callback-Funktion an, die ein `Promise` mit der gewünschten Ergebnis zurückliefert
+* Wenn ihr das Ergebnis direkt setzt, könnt ihr zwei Parameter übergeben:
+  1. Den Body, der zurückgeliefert werden soll Achtung! String kein Objekt! (ggf.`JSON.stringify()` verwenden)
+  2. Ein Objekt mit init-Parametern, mit dem ihr z.B. den Status setzen könnt
+  * siehe dazu [API Dokumentation der Response Funktion](https://developer.mozilla.org/en-US/docs/Web/API/Response/Response)
+* ```
+  const mockPosts = [ { title: "Hello", body: "World"} ];
+  // liefert HTTP 200 OK zurück für alle folgenden fetch-Aufrufe zurück:
+  fetchMock.mockResponse(JSON.stringify(mockPosts));
   ```
----
-### Renderverhalten von Context #2
-* Unterdrücken von erneutem Rendern
-* <!-- .element: class="demo" --> `CounterDispay` aufteilen in lesen und schreiben
-
----
-### Wie können wir das Rendern von Konsumenten unterdrücken?
-* Der `Clear`-Button wird immer gerendert, auch wenn der sich gar nicht ändert 😢
-* Woran liegt das?
-* Was müssen wir tun, damit der nicht gerendert wird?
-  * Wenn sich _irgendetwas_ im Kontext ändert, werden _alle_ Konsumenten neu gerendert
-    * Auch wenn sie auf Teile des Kontextes zugreifen, der sich nicht verändert hat.
-  * Um den `Clear`-Button vom Rendern auszuschliessen, muss also die `onClearForm`-Funktion
-    aus dem `FormContext`
-  * Dazu wird ein neuer Context erzeugt. Je nachdem kann eine Komponente dann den einen oder
-    anderen (oder beide) konsumieren.
----
-### Rendern optimieren
-<!-- .slide: class="left" -->
-* Beispiel: zwei Kontexte für das Formular
-* ```typescript
-    // FormContext wie bisher, aber ohne onFieldChange und ohne onClearForm
-
-    // Neuer Context:
-    type IFormChangeContext = {
-      onClearForm(): void;
-      onFieldChange(fieldname: string, value: string): void;
-    };
-
-    const FormChangeContext = createContext<IFormChangeContext | null>(null);
-  ```
-* ```typescript
-    function Form({ children }: FormProps) {
-      // state + Callback-Funktionen wie bisher
-
-      return (
-        <FormContext.Provider
-          value={{
-            formState
-          }}
-        >
-          <FormChangeContext.Provider value={{ onClearForm, onFieldChange }}>
-            {children}
-          </FormChangeContext.Provider>
-        </FormContext.Provider>
-      );
-    }  
-  ```
-* Geht das?  
-* <!-- .element: class="demo" --> Prüfen!    
----
-### Memoisieren von Komponenten
-* Wenn eine Komponente gerendert wird, werden grundsätzlich _alle_ Unterkomponenten gerendert
-* Das bedeutet im gezeigten Fall:
-  * beim Rendern von `Form` wird *immer* auch `FormContext.Provider` gerendert und *immer* auch `FormChangeContext.Provider`.
-  * Wir haben also noch nichts gewonnen.
-  * Oder? 🤔
-    * Eventuell haben wir immerhin eine sauberere Architektur durch Trennung in "lesenden" und "modifizierenden" Context
----
-### Memoisieren von Komponenten  
-* Man kann das Rendern von Komponenten durch "Memoisieren" (eine Art Caching) unterdrücken
-* Komponenten werden dann nur gerendert, wenn sich ihre Properties verändert haben.
-* Variante 1 mit `React.memo`
-* ```typescript
-  const FormChangeContextProvider = React.memo( 
-    function FormChangeContextProvider({ children, onClearForm, onFieldChange }) {
-      return  <FormChangeContext.Provider value={{ onClearForm, onFieldChange }}>
-        {children}
-      </FormChangeContext.Provider>
-    }
-  );
-  ```
-* Für den Verwender ist das transparent:  
-* ```typescript
-  function Form({ children }: FormProps) {
-    // ...
-    return  <FormContext.Provider value={/* ... */}>
-        <FormChangeContextProvider 
-          onClearForm={onClearForm}
-          onFieldChange={onFieldChange}
-          >{children}</FormChangeContextProvider/>
-      </FormContext.Provider>
-  }
-  ```
-* Diese Komponente wird nun neugerendert, wenn sich eines der Properties ändert (`children`, `onClearForm` und/oder `onFieldChange`)
-* Reicht das? 🤔
----
-### Memoisieren von Komponenten
-* Eine Komponente ist eine Funktion
-* Die Funktion wird bei jedem Rendern neu ausgeführt
-* Alle Dinge, die darin erzeugt werden, sind bei jedem rendern "neu" (neue Referenz)!
-* ```typescript
-  function Form() {
-    const onClearForm = () => setFormState({});
-
-    return ...;
-  }
-  ```
-* `onClearForm` ist bei jedem Rendern von `Form` "neu"
-* Dasselbe gilt für Objekte
-* ```typescript
-  function Form() {
-    const emptyArray = [];
-  ```
-* `emptyArray` ist bei jedem Rendern von `Form` "neu"
-* Wir müssen also dafür sorgen, dass diese Werte und Funktionen "stabil" über mehrere Renderzyklen sind
----
-### useMemo und useCallback
-* Um Werte über mehrere Renderzyklen zu erhalten, kann man `useMemo` (Werte) und `useCallback` verwenden
-  * (`useCallback` ist eine Vereinfachung von `useMemo` für Funktionen)
-* Die Verwendung von beiden erinnert an `useEffect` 😱:
-  * Es gibt eine Callback-Funktion (die liefert den Wert bzw. die Funktion zurück)
-  * Es gibt ein Dependency-Array, das bestimmt, wann der Wert/Funktion ungültig ist.
-  * Das Dependency-Array _muss_ angegeben werden - im Gegensatz zu `useEffect`. Warum?
-* ```typescript
-  function Form({title, subtitle}) {
-    // Funktion wird nur einmal erzeugt
-    const onClearForm = useCallback( () => setFormState({}), []);
-
-    // Array wird immer neu erzeugt, wenn title oder subtitle sich ändert
-    const titleArray = useMemo( () => { return [title, subtitle] }, [title, subtitle] );
-  }
-  ```
-* Damit haben wir nun unser Problem gelöst?
----
-### useMemo und useCallback: stale Values
-* Was passiert denn hier:
-* ```typescript
-  function Form() {
-    const [formState, setFormState] = React.useState({});
-
-    const onFieldChange = useCallback(function(fieldname, value) {
-      setFormState({
-        ...formState,
-        [fieldname]: value
-      });
-    }, []);
-  }
-  ```
-* Der Wert von `formState` wird beim erstmaligen rendern innerhalb der Callback-Funktion "eingefroren" 
-* Werte in einer Funktion (Closure) haben immer den Wert von dem Zeitpunkt, zu dem die Funktion ausgeführt wurde
-* Das fällt häufig gar nicht auf
-* Hier schon, denn formState verbleibt immer auf dem ersten Wert 😢
-* Was können wir tun?
-
----
-### useMemo und useCallback: stale Values
-* Genau wie bei `useEffect` können wir bei `useMemo` und `useCallback` bestimmen, wann der gecachte Wert ungültig ist
-* Im gezeigten Beispiel wäre das, wenn `formState` sich ändert:
-* ```typescript
-    function Form() {
-      const [formState, setFormState] = React.useState({});
-
-      const onFieldChange = useCallback(function(fieldname, value) {
-        setFormState({
-          ...formState,
-          [fieldname]: value
-        })
-      }, [ formState ]);
-    } 
-  ```
-* Ist das gut?
-  * Es kommt drauf an!
----
-### useMemo und useCallback: stale Values
-* Grundsätzlich kann es richtig sein, bei Änderung von Werten auch neue Werte und Funktionen zu erzeugen
-* Wir wollen ja nicht "für immer" cachen, sondern nur so lange "wie es geht"
-* Im gezeigten Fall würde das für die Form bedeuten:
-  * Immer wenn sich der State ändert, ändert sich `onFieldChange`
-  * Dadurch wird dann auch `FormChangeContextProvider` neu gerendert
-  * Das bedeutet, wir haben nichts gewonnen: wenn sich der Zustand ändert, wir dauch der Clear-Button neugerendert
----
-### Callback-Funktion von useState
-* Im konkreten Fall können wir weiter optimieren, in dem wir beim Setzen des Zustandes eine Callback-Funktion angeben  
-* Die Callback-Funktion wird von React aufgerufen und ihr wird der _aktuellste_ Werte des States übergeben
-* Die Callback-Funktion liefert dann den neuen State zurück
-* Damit haben wir keinen Wert mehr in der Closure, der "stale" sein könnte, und es reicht, wenn wir die Funktion
-  einmal erzeugen (leeres Dependency Array)
-* ```typescript
-  function Form() {
-    const [formState, setFormState] = React.useState({});
-
-    const onFieldChange = useCallback(function(fieldname, value) {
-      setFormState( () => return {
-        ...formState,
-        [fieldname]: value
-      })
-    }, [ ]);
-  }   
-  ```
----
-### Memoisieren: memo, useCallback und useMemo
-<!-- .slide: class="left" -->
-* Sollte man das immer und überall machen?
-* Alles mit useMemo und useCallback umschliessen?
-* ```typescript
-  function Greet({name}) {
-    const greeting = useMemo(`Hello, ${name}!`, [name]); // 🤔
-
-    return <h1>{greeting}</h1>
-  }  
-
-  ```
-* Was spricht dafür? Was spricht dagegen? 🤔
-
----
-### Ausblick: Memoisieren: memo, useCallback und useMemo
-
-* Es soll einen eigenen Compiler für React geben ("React forget")
-* Der soll die Abhängigkeiten für `useCallback` und `useMemo` automatisch erkennen
-* Dann wird die Arbeit damit hoffentlich einfacher
-
----
-### Übung: Memoisieren von Komponenten
-* Teile den `FormContext` in zwei Teile:
-  * `FormContext`: die beiden Callback-Funktionen entfernen
-  * `FormChangeContext`: hierein die beiden Funktionen zum Modifizieren des Zustands
-* Einzige Änderung im Verhalten: die `ClearButton`-Komponente soll den neuen Kontext verwenden (und sich _nicht_ neu rendern, wenn das Formular ausgefüllt wird)
-* Kannst Du statt der gesehenen `FormChangeContextProvider` eine Lösung mit `React.useMemo` statt `React.memo` bauen? 😳
-* Wenn Du vorhin nicht fertig geworden bist, oder deine Lösung nicht funktioniert, kopiere `steps/10_PersonForm_mit_context.tsx` in deine `App.tsx`-Datei als Basis für die Übung
-* Eine fertige Lösung findest Du in `steps/20_PersonForm_mit_context_und_memo.tsx`
-* Wenn Du fertig bist, bitte die Hand heben ✋
+* ```
+const mockResponse = { id: "100", title: "Hello", body: "World", createdAt: "2022-09-06"};
+// liefert HTTP 201 CREATED für den nächsten fetch-Aufrufe zurück:
+fetchMock.mockResponse(JSON.stringify(mockResponse), { status: 201 });
+```
 
 
           </textarea>
         </section>
 
+        <!-- ============================================================================= -->
+        <section>
+          <h3>Ansatz #3: Mock Service Worker (MSW)</h3>
+
+          <p><a href="https://github.com/mswjs/msw" target="_blank">MSW</a></p>
+          <p>
+            MSW mockt echte Server-Aufrufe mit einem
+            <a
+              href="https://developer.mozilla.org/de/docs/Web/API/Service_Worker_API"
+              >Service Worker</a
+            >
+          </p>
+          <p>
+            fetch-Aufrufe werden "richtig" ausgeführt, aber beantwortet von dem
+            Service Worker Mock
+          </p>
+
+          <pre><code class="javascript">
+            // PostList.test.js
+            import { rest } from 'msw'
+            import { setupServer } from 'msw/node'
+
+            const server = setupServer(
+              rest.get('/posts', (req, res, ctx) => {
+                return res(ctx.json( mockPosts ))
+              }),
+            )
+
+            test("it should render blog list", async () => {
+              render(&lt;PostList />);
+              // ...
+            })
+          </code></pre>
+        </section>
         <section data-markdown>
           <textarea data-template>
 # Immutable DAten
@@ -1562,12 +2000,21 @@ die Liste mit den (JSON-)Posts zurückkommen
           <h3>Vielen Dank für Eure Teilnahme!</h3>
           <h3>Viel Spaß und Erfolg mit React!</h3>
           <p>Wenn ihr noch Fragen habt, könnt ihr mich erreichen:</p>
-          <p>Mail: <a href="mailto:nils@nilshartmann.net">nils@nilshartmann.net</a></p>
           <p>
-            Web: <a href="https://nilshartmann.net" target="_blank">https://nilshartmann.net</a>
+            Mail:
+            <a href="mailto:nils@nilshartmann.net">nils@nilshartmann.net</a>
           </p>
           <p>
-            Twitter: <a href="https://twitter.com/nilshartmann" target="_blank">@nilshartmann</a>
+            Web:
+            <a href="https://nilshartmann.net" target="_blank"
+              >https://nilshartmann.net</a
+            >
+          </p>
+          <p>
+            Twitter:
+            <a href="https://twitter.com/nilshartmann" target="_blank"
+              >@nilshartmann</a
+            >
           </p>
         </section>
       </div>
