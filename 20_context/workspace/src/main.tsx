@@ -9,5 +9,5 @@ import PostEditor from "./PostEditor.tsx";
 // - je nach Bedarf 'render' anpassen:
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <PostEditor onSavePost={() => {}} />,
+  <NotificationApp />,
 );
