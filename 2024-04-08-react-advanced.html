@@ -1057,6 +1057,251 @@ render(
           </textarea>
         </section>
 
+        <section data-markdown>
+          <textarea data-template>
+## Error Boundaries
+* 🤔Was passiert, wenn wir in unserer App vergessen, den `NotificationContextProvider` einzubinden? 🤔
+* <!-- .element: class="demo" -->Ausprobieren (NotificationApp.tsx)
+---
+## Error Boundaries
+
+* Wenn beim **Rendern** etwas schiefgeht, verwirft React "zur Sicherheit" den ganzen Komponenten-Tree
+  * (damit nicht z.B. inkonsistente oder fehlerhafte Daten angezeigt werden)
+* Das ist nicht besonders benutzerfreundlich
+* In einem Event-Handler haben wir dieses Problem nicht: dort können wir z.B. mit try/catch arbeiten
+  * oder der Event-Handler wird einfach abgebrochen und die "alte" UI bleibt weiterhin sichtbar
+* Beim Rendern können wir aber kein try/catch drumherum legen
+* Deswegen gibt es "spezielle" Komponenten: **Error Boundaries**
+---
+### Error Boundaries
+* Error Boundary-Komponenten kann man überall in seiner Komponenten-Hierarchie einziehen
+* Render-Fehler, die unterhalb auftreten, werden dann der Error Boundary-Komponente übergeben
+  * Diese kann dann z.B. eine Fehler-Komponente darstellen
+  * Dieses Verhalten ähnelt try-catch.
+  * Auch try-catch-Blöcke in "normalem" Code könnt ihr ja auf jeder Ebene des Call-Stacks einziehen
+* Ein Beispiel:
+* ```typescript
+  function MyApp() {
+    return (
+      <Layout>
+        <Header />
+        <MyErrorBoundary>
+            <Main>
+              <BlogPost />
+            </Main>
+            <NewsletterForm />
+        </MyErrorBoundary>
+      </Layout>
+    )
+  }
+  ```
+* Wenn es hier zum Fehler **während des Renderns** kommt:
+  * innerhalb von `Layout` oder `Header`: weiße Seite, Fehlermeldung auf der Console
+  * innerhalb von `Main`, `BlogPost` oder `NewsletterForm`: Error Boundary wird angezeigt, `Layout` und `Header`-Komponente bleiben unverändert (gerendert)
+---
+### Error Boundaries
+* Eine Error Boundary-Komponente ist eine Art `catch`-Block für die Renderphase von Komponente
+* Technisch handelt es sich dabei um eine fast "normale" React-Komponente
+* Diese muss allerdings noch mit der (alten) React JavaScript Klassen API gebaut werden
+* Diese Klasse muss dann die [getDerivedStateFromError](https://react.dev/reference/react/Component#static-getderivedstatefromerror) Callback-Funktion implementieren
+* Einfacher ist es, eine fertige Error Boundary-Komponente zu verwenden: [react-error-boundary](https://github.com/bvaughn/react-error-boundary)
+---
+### Error Boundary mit `react-error-boundary`
+* Die Error Boundary-Komponente aus der Bibliothek heißt - Überraschung! - `ErrorBoundary`
+* Die ist sehr flexibel zu konfigurieren
+* Man muss ihr eine Komponente übergeben die im Falle eines Fehlers gerendert werden soll
+  * (das ist euer "try-Block")
+* Diese Komponente bekommt dann als Property u.a. den Fehler übergeben:
+* ```typescript
+  import { FallbackProps } from "react-error-boundary";
+
+  function AppErrorMessage( { error }: FallbackProps) {
+
+    console.error("Something bad happend:", error);
+    return <h1>Something bad happend !</h1>;
+  }
+  ```
+* ```typescript
+  import { ErrorBoundary } from "react-error-boundary";
+  function MyApp() {
+    return (
+      <Layout>
+        <Header />
+        <ErrorBoundary fallback={AppErrorMessage}>
+            <Main>
+              <BlogPost />
+            </Main>
+            <NewsletterForm />
+        </ErrorBoundary>
+      </Layout>
+    )
+  }
+
+  ```
+---
+### react-error-boundary
+* Der `fallback`-Komponente wird überdies eine Funktion `resetErrorBoundary` übergeben
+* Die könnt ihr aufrufen, dann wird erneut versucht, den Komponenten-Tree unterhalb der `ErrorBoundary`-Komponente zu rendern
+* Das macht Sinn wenn es Grund zur Annahme gibt, der Fehler verschwinde später (z.B. Netzwerkverbindung ist wieder in Ordnung)
+* ```typescript
+  import { FallbackProps } from "react-error-boundary";
+
+  function AppErrorMessage( { error, resetErrorBoundary }: FallbackProps) {
+
+    console.error("Something bad happend:", error);
+    return (
+      <div>
+        <h1>Something bad happend !</h1>
+        <button onClick={ () => resetErrorBoundary() }>Try again!</button>
+      </div>
+    );
+  }
+  ```
+* Wenn ihr eine Möglichkeit habt, einen fehlerhaften Zustand zu reparieren, könnt ihr an der `ErrorBoundary`-Komponente eine `onReset`-Funktion angeben
+* Diese wird dann aufgerufen, wenn ihr `resetErrorBoundary` in der Fallback-Komponente aufruft
+---
+### react-error-boundary
+
+* Normalerweise werden Error Boundary-Komponenten von React nur dargestellt, wenn ein Fehler **beim Rendern** auftritt
+* Die `ErrorBoundary`-Komponente von `react-error-boundary` könnt ihr aber auch manuell rendern lassen, wenn z.B. in einem Event ein Fehler auftritt.
+  * So könnt ihr eure Fehlerbehandlung dann auf alle Arten von Fehlern in eurer Anwendung anwenden
+* Um die `ErrorBoundary`-Komponente anzuzeigen, verwendet ihr den `useErrorBoundary`-Hook:
+* ```typescript
+  import { useErrorBoundary } from "react-error-boundary";
+
+  function PostEditor() {
+    const { showBoundary } = useErrorBoundary();
+
+    async function saveBlogPost() {
+      try {
+        await fetch("...");
+      } catch (e) {
+        showBoundary("Could not save blog post");
+      }
+    }
+    return ...;
+  }
+  ```
+* Genau wie bei Error Boundaries, die beim Rendern aktiv werden, wir hier auch die nächsthöhere `ErrorBoundary`-Komponente angezeigt
+
+  </textarea
+          >
+        </section>
+
+        <section>
+          <h3>Exkurs: Error Boundary selbstgebaut</h3>
+          <p class="fragment">
+            <b>getDerivedStateFromError</b> und <b>componentDidCatch</b> werden
+            von React im Fehlerfall aufgerufen
+          </p>
+          <pre
+            class="fragment"
+          ><code class="javascript" contenteditable data-trim>
+              class ErrorHandler extends React.Component {
+                constructor(props) {
+                  super(props);
+                  this.state = { error: null };
+                }
+
+                static getDerivedStateFromError(error) {
+                  return { error: error.toString() };
+                }
+
+                componentDidCatch(error, info) {
+                  console.error("uups... we caught an error", error, info);
+                }
+
+                render() {
+                  if (this.state.error) {
+                    return (
+                      &lt;div>
+                        &lt;h1>An error occured!&lt;/h1>
+                        &lt;pre>{this.state.error}&lt;/pre>
+                        &lt;button onClick={() => this.setState({ error: null })}>Try again&lt;/button>
+                      &lt;/div>
+                    );
+                  }
+                  return this.props.children;
+                }
+              }
+            </code></pre>
+        </section>
+
+        <section>
+          <h3>Exkurs: Error Boundary selbstgebaut</h3>
+          <h4>Lifecycle</h4>
+
+          <div style="display: flex">
+            <pre><code class="javascript" contenteditable data-trim>
+                  class ErrorHandler extends React.Component {
+                    constructor(props) {
+                      super(props);
+                      this.state = { error: null };
+                    }
+
+                    static getDerivedStateFromError(error) {
+                      return { error: error.toString() };
+                    }
+
+                    componentDidCatch(error, info) {
+                      console.error("uups... we caught an error", error, info);
+                    }
+
+                    render() {
+                      if (this.state.error) {
+                        return (
+                      &lt;div>
+                         &lt;h1>An error occured!&lt;/h1>
+                        &lt;pre>{this.state.error}&lt;/pre>
+                        &lt;button onClick={() => this.setState({ error: null })}>Try again&lt;/button>
+                      &lt;/div>
+                        );
+                      }
+                      return this.props.children;
+                    }
+                  }
+                </code></pre>
+
+            <ol>
+              <li class="fragment">
+                Komponente wird instantiiert, Konstruktor aufgerufen, State
+                vorbelegt (error = null)
+              </li>
+              <li class="fragment">
+                Komponente wird gerendert. Da
+                <code>this.state.error</code> nicht gesetzt ist, werden die
+                Children gerendert
+              </li>
+              <li class="fragment">
+                Fehler tritt in Unterkomponente beim Rendern auf
+              </li>
+              <li class="fragment">
+                <code>componentDidCatch</code> wird aufgerufen (Fehler kann z.B.
+                protokolliert werden)
+              </li>
+              <li class="fragment">
+                <code>getDerivedStateFromError</code> wird aufgerufen und
+                liefert einen neuen Teil-State zurück. <br />(Andere Teile des
+                States bleiben unverändert)
+              </li>
+              <li class="fragment">
+                Komponente wird erneut gerendert. Da
+                <code>this.state.error</code> jetzt gesetzt ist, wird die
+                Fehlermeldung angezeigt, inklusive des Buttons
+              </li>
+              <li class="fragment">
+                Nach dem Klick auf den Button, wird
+                <code>this.state.error</code> wieder auf null gesetzt
+              </li>
+              <li class="fragment">
+                Komponente wird neu gerendert (durch <code>setState</code>). Da
+                <code>this.state.error</code> wieder null ist, werden die
+                Children erneut gerendert
+              </li>
+            </ol>
+          </div>
+        </section>
+
         <section>
           <h3>Testen von fetch-Aufrufen</h3>
           <p>Herausforderungen:</p>
