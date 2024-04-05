@@ -950,6 +950,112 @@ render(
 * Wenn Du fertig bist, bitte "Hand heben" 🙋‍
           </textarea>
         </section>
+        <section data-markdown>
+          <textarea data-template>
+### Testen von (Custom) Hooks
+
+* Hooks könnt ihr nicht "einfach so" aufrufen und Testen, denn die setzen zur Laufzeit ja die React Infrastruktur voraus
+* Es gibt zwei Möglichkeiten:
+  1. Ihr schreibt euch im Test eine Wrapper-Komponente, die den Hook verwenden und testet die dann "wie gewohnt"
+  2. Ihr verwendet `renderHook`
+* <!-- .element: class="demo" --> `useCounter.test.tsx`
+---
+### renderHook
+* `renderHook` erwartet eine Callback-Funktion. In dieser Callback-Funktion könnt ihr euren Hook dann aufrufen.
+* Als Beispiel soll folgender Custom Hook dienen, der ein Objekt mit einem  Zähler und eine Funktion zum Hochsetzen des Zählers zurückliefert:
+* ```typescript
+  // Diesen Hook wollen wir testen:
+  function useDemoCounter() {
+    const [count, setCount] = useState(100);
+
+    function increaseCount() { setCount(count + 1); }
+
+    return { count, increaseCount };
+  }
+  ```
+* Zum "rendern" dieses Hooks verwendet ihr `renderHook` aus der testing-library:
+* ```typescript
+
+  import { renderHook } from "@testing-library/react";
+
+  test("useDemoCounter Works", () => {
+    const { result } = renderHook(() => useDemoCounter());
+
+    // ....
+  });
+  ```
+---
+### renderHook
+* `renderHook` liefert ein Objekt zurück, das unter anderem ein `result` Property kennt
+* Darauf wiederrum ist das `current`-Property definiert, das den Rückgabewert eures Hooks enthält
+* Dieses könnt ihr zum Überprüfen der Daten verwenden:
+* ```typescript
+  test("useDemoCounter Works", () => {
+    const { result } = renderHook(() => useDemoCounter());
+
+    expect(result.current.counter).toBe(100);
+  });
+
+  ```
+---
+### Neurendern des Hooks
+* Im Test könnt ihr nicht einfach Funktionen aufrufen, die Euer Hook bereitstellt, die dann die React API verwenden
+  * In unserem Fall z.B. geht `result.current.increaseCounter()` nicht, weil darin der State verändert wird
+* In solchen Fällen müsst ihr den Aufruf mit der `act`-Funktion aus der testing-library wrappen.
+* Nach dem Aufruf ist das `result.current` Objekt dann automatisch das aktualisierte Rückgabe-Objekt eures Hooks
+* ```typescript
+  import { act, renderHook } from "@testing-library/react";
+
+  test("useDemoCounter Works", () => {
+    const { result } = renderHook(() => useDemoCounter());
+
+    act( () => result.current.increaseCounter() );
+
+    // 'result.current' ist hier automatisch das aktualisierte Rückgabe-Ergebnis,
+    // das euer Hook in React nach dem neu-rendern zurückliefern würde
+    expect(result.current.counter).toBe(100);
+  })
+  ```
+---
+### Testen eines Contexts
+* Können wir mit den gezeigten Mitteln unseren `useNotification`-Hook testen? 🤔
+* Ja, aber...
+* Der Hook setzt ja voraus, dass die Provider-Komponente auch gerendert ist!
+* Die `renderHook`-Funktion ist darauf vorbereitet. Denn intern generiert sie bereits eine Komponente, die sie im Test um euren Hook herumlegt
+* Und diese interne Komponente können wir auch explizit setzen!
+* Dazu gibst Du eine `wrapper`-Funktion als zweiten Parameter beim Aufruf von `renderHook` an
+* Diese `wrapper`-Funktion muss eine Komponente zurückliefern, die alle erforderlichen Kontexte etc. enthält
+* Als Parameter erhält die `wrapper`-Funktion das `children`-Property, dass Du in deiner "Dummy-Komponente" verwenden musst:
+* ```typescript
+  test("context works", () => {
+    const {result} = renderHook(
+
+      // erster Parameter: wie eben schon im useCounter-Beispiel
+      () => useNotificationContext(),
+
+      // zweiter Parameter: die wrapper-Komponente
+      { wrapper: ({ children }) => (
+        <NotificationContextProvider>{children}</NotificationContextProvider>
+      )},
+    });
+
+    expect(result.current.messageId).toBe(null);
+    // ...
+  })
+
+  ```
+---
+### Übung: Test für den Notification Context
+* Schreibe einen Test für den NotificationContext
+* Du kannst selbst entscheiden, was der beste Weg für dich ist bzw. welche(n) Du ausprobieren möchtest.
+  1. Test-Komponente schreiben, die den Context verwendet und dann die Ausgaben der Test-Komponente überprüfen
+  2. `renderHook`-Verwenden
+* Eine Vorlage findest Du in `20_context/workspace/__tests__/NotificationContext.test.tsx`
+* Eine mögliche Lösung findest Du in `20_context/material/04_test_context`
+* Bei Fragen oder Problemen kannst Du dich jederzeit melden
+* Wenn Du fertig bist, bitte die Hand heben ✋
+          </textarea>
+        </section>
 
         <section>
           <h3>Testen von fetch-Aufrufen</h3>
