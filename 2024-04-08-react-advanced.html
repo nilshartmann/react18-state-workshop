@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>React Vertiefung</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"
+    />
+    <link rel="stylesheet" href="slides/revealjs/reveal.js/dist/reset.css" />
+    <link rel="stylesheet" href="slides/revealjs/reveal.js/dist/reveal.css" />
+    <link rel="stylesheet" href="slides/revealjs/reveal.js/dist/theme/solarized.css" />
+
+    <!-- Theme used for syntax hislides/ghlighted code -->
+    <link rel="stylesheet" href="slides/revealjs/highlight-js-github-theme.css" />
+    <link rel="stylesheet" href="slides/revealjs/styles.css" />
+  </head>
+
+  <body>
+    <div class="reveal">
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+        <section data-state="title">
+          <h2 class="title" style="font-size: 7rem">
+            <b>React Vertiefung</b>
+          </h2>
+
+          <h4>
+            <span class="transparent-bg">
+              <a href="https://nilshartmann.net" target="_blank">Nils Hartmann</a>
+              |
+              <a href="https://twitter.com/nilshartmann" target="_blank">@nilshartmann</a>
+            </span>
+          </h4>
+          <p style="margin-top: 4rem"></p>
+          <div>
+            <h3><span class="transparent-bg">Repository</span></h3>
+            <p>
+              <span class="transparent-bg"
+                >Remote:
+                <a href="https://github.com/nilshartmann/react18-training"
+                  >https://github.com/nilshartmann/react18-training</a
+                ></span
+              >
+            </p>
+          </div>
+          <p style="margin-top: 4rem"></p>
+          <div>
+            <h3><span class="transparent-bg">Slides</span></h3>
+            <p>
+              <span class="transparent-bg">Lokal: 2024-04-08-react-advanced.html</span>
+            </p>
+            <p>
+              <span class="transparent-bg"
+                >Remote:
+                <a
+                  href="https://nilshartmann.github.io/react18-training/2024-04-08-react-advanced.html"
+                  >https://nilshartmann.github.io/react18-training/2024-04-08-react-advanced.html</a
+                ></span
+              >
+            </p>
+          </div>
+        </section>
+        <section>
+          <h2>Nils Hartmann</h2>
+          <p>
+            <a href="https://nilshartmann.net" target="_blank">https://nilshartmann.net</a>
+            /
+            <a href="https://twitter.com/nilshartmann" target="_blank">@nilshartmann</a>
+          </p>
+          <p>
+            <em>Freiberuflicher Software-Entwickler, Berater und Trainer aus Hamburg</em>
+          </p>
+
+          <div style="display: flex; justify-content: center">
+            <div>
+              <p>Java</p>
+              <p>JavaScript, TypeScript</p>
+              <p>React</p>
+              <p>Single-Page-Applications</p>
+              <p>GraphQL</p>
+              <p style="margin-top: 20px">
+                <a href="https://nilshartmann.net/workshops">Schulungen und Workshops</a>
+              </p>
+            </div>
+            <div style="margin-left: 15px">
+              <a href="https://reactbuch.de"
+                ><img
+                  style="max-height: 450px"
+                  src="slides/images/react-buch-v2.jpg"
+                /><br />https://reactbuch.de</a
+              >
+              <br />
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================================= -->
+        <section data-markdown>
+          <textarea data-template>
+## Agenda
+<!-- .slide: class="no-fragment xleft" -->
+**_"Modernes Data- und Statemanagement"_**
+
+* **Montag**
+  * [Context API](#/t-context)
+    * Neuerungen in [React 19](#/t-react19) 
+    * Renderzyklen optimieren mit [useCallback, useMemo](#/t-context-render)
+  * [TanStack Query](#/t-tanstack-query)
+    * "Modernes" React: Data Fetching mit Suspense
+
+* **Dienstag**
+  * Code Review, mögliche Refaktorings, ...
+
+          </textarea>
+        </section>
+
+        <!-- ============================================================================== -->
+        <!-- ====                                                                      ==== -->
+        <!-- ====            C O N T E X T                                             ==== -->
+        <!-- ====                                                                      ==== -->
+        <!-- ============================================================================== -->
+        <section id="t-context">
+          <h3>Hintergrund: Daten und State</h3>
+          <ul>
+            <li>Serverseitige <b>Daten</b> und clientseitiger <b>State</b></li>
+            <li>Arten von State: <b>lokal</b> und <b>global</b></li>
+            <li>Überblick: 👉 Daten und State</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Hintergrund: Globaler Zustand</h3>
+          <ul>
+            <li>
+              Man kann Zustand in <b>lokalen Zustand</b> und <b>globalen Zustand</b> einteilen
+            </li>
+            <li>
+              <b>Lokaler Zustand</b> ist Zustand, der "mehr oder weniger" einer Komponente zur
+              Verfügung steht
+            </li>
+            <li>
+              <b>Globaler Zustand</b> hingegen ist für die ganze Anwendung oder große Teile davon
+              zuständig
+            </li>
+            <li>Die Übgergänge sind fließend, es gibt keine fixe Definition</li>
+            <li>Beispiele für globalen Zustand: angemeldeter Benutzer, Theme</li>
+          </ul>
+        </section>
+        <section>
+          <h2>React Context API</h2>
+          <p>Kein Statemanagement, aber häufig zusammen erwähnt</p>
+          <p>"Dependency Injection"</p>
+          <p>Überblick: 👉 Anwendungshierachie mit State und Props (Miro)</p>
+        </section>
+
+        <!-- ============================================================================= -->
+
+        <section>
+          <h2>Im Detail: Context API</h2>
+          <p>Beispiel: <code>20_context/workspace</code></p>
+          <p>
+            In <code>Container.tsx</code> Anzeige der Border einschalten (<code
+              >hideBorder = false</code
+            >)
+          </p>
+          <p><code>CounterApp</code> rendern!</p>
+          <p>
+            In <code>Container.tsx</code> Anzeige der Renderings einschalten (<code
+              >showRenderings = true</code
+            >)
+          </p>
+          <p>(Material in <code>context-example/material/CounterContext.txt</code>)</p>
+        </section>
+
+        <section>
+          <h2>Context...</h2>
+          <p>
+            <em
+              >erlaubt das Durchreichen von Informationen ohne explizites angeben als Properties</em
+            >
+          </p>
+
+          <ul>
+            <li>funktioniert nur innerhalb einer Hierarchie-Ebene</li>
+            <li>es können beliebg viele (fachliche) Context definiert werden</li>
+            <li>besteht aus <code>Provider</code> und <code>Consumer</code></li>
+            <li>
+              <a href="https://reactjs.org/docs/context.html" target="_blank">Doku</a>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Context Factory</h2>
+          <ul>
+            <li>
+              <em>erzeugt ein Objekt, mit <b>zwei Komponenten</b></em>
+            </li>
+            <li>
+              <code>Provider</code>, stellt Objekt mit Key-Value-Paaren zur Verfügung (der
+              Context-"Value")
+            </li>
+            <li>
+              <code>Consumer</code> wird in eigener Komponente verwendet, um auf einen Context
+              zuzugreifen ("versteckt" durch useContext Hook)
+            </li>
+            <li>
+              <pre><code class="line-numbers" data-leftpad>
+import react from "React";
+
+const AuthContext = React.createContext();
+
+// erzeugt:
+// AuthContext.Provider 
+// AuthContext.Consumer (mit Hooks API überflüssig)
+
+export AuthContext;
+                      </code></pre>
+            </li>
+          </ul>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+## Context Factory mit TypeScript
+
+* Der `createContext` kann ein Typ-Parameter übergeben werden, der den Context-Wert beschreibt
+* `createContext` benötigt dann einen Default-Wert, der diesem Typen entspricht
+  * Der Default-Wert wird in der Anwendung in der Regel nicht verwendet
+  * Wird nur verwendet, wenn (fälschlich) auf den Kontext zugegriffen wird, ohne dass es einen Provider
+    gibt
+* ```typescript
+  type IAuthContext = { 
+    username: string | null;
+    onLogin(newUser: string): void;
+    onLogout(): void;
+  }
+
+  const AuthContext = React.createContext<IAuthContext>({
+    // Dummy-Implementierung vom Default Context
+    username: null,
+    onLogin() {},
+    onLogout() {}
+  });
+
+  export AuthContext;
+  ```
+
+          </textarea>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+## Context Provider
+
+* _Eine React-Komponente, die einen Context zur Verfügung stellt_
+  * wird innerhalb einer eigenen Komponente eingebunden und zurückgeliefert
+  * Nimmt ein Objekt ("Context") mit beliebigen Werten entgegen (`value`-Property)
+  * Woher die Werte kommen (State, Props, anderer Kontext, ...) spielt keine Rolle!
+  * Alle Einträge des Objektes sind für die Konsumenten verfügbar
+* ```typescript
+  const AuthContext = React.createContext&lt;IAuthContext>(/*...*/); // wie gesehen
+
+  type AuthProviderProps = {
+    children: React.ReactElement
+  }
+
+  export function AuthProvider(props: AuthProviderProps) {
+      const [ currentUser, setCurrentUser ] = React.useState(null);
+
+      const contextValue: IAuthContext = {
+        // the current user
+        currentUser,
+
+        // function to set new user
+        function onLogin(name) { setCurrentUser(name) },
+        function onLogout() { setCurrentUser(null) }
+      };
+
+      return &lt;AuthContext.Provider value={contextValue}>
+        {props.children}
+      &lt;/AuthContext.Provider>;
+  }             
+  ```
+  </textarea
+          >
+        </section>
+
+        <section>
+          <h2>useContext-Hook</h2>
+          <p><em>Zugriff auf die Werte aus dem Context</em></p>
+          <p>
+            In allen Komponenten unterhalb der Provider Komponente, kann mit
+            <code>useContext</code> auf den Kontext zugegriffen werden
+          </p>
+
+          <pre><code class="javascript">
+import { AuthContext } from "auth-context";
+
+function UserBadge() {
+  const { currentUser } = React.useContext(AuthContext);
+
+  return currentUser  ? &lt;h1>Welcome, {currentUser}&lt;h1> : null;
+}            
+          </code></pre>
+
+          <p>Aufrufen einer Funktion aus dem Context</p>
+          <p>Ändert im Context den Zustand der Provider-Komponente</p>
+          <p>Alle Konsumer werden neu gerendert und können den neuen Wert verwenden</p>
+          <pre><code class="javascript">
+function UserBadge() {
+  const { currentUser, logout } = React.useContext(AuthContext);
+
+  return currentUser  ? 
+    &lt;>&lt;h1>Welcome, {currentUser}&lt;h1>&lt;button onClick={logut}>Logout&lt;/button>&lt;/> 
+    : null;
+}                
+          </code></pre>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+## Zugriff mit Custom Hook
+
+* Übliches Pattern: für den Zugriff auf den Context wird ein eigener Hook zur Verfügung gestellt
+* ```typescript
+  export function useAuthContext(): IAuthContext {
+    const authContext = useContext(AuthContext);
+
+    return authContext;
+  }            
+  ```
+* ```typescript
+  import { useAuthContext } from "auth-context";
+  
+  export default function UserBadge() {
+    const authContext = useAuthContext();
+  }
+  ```  
+
+  * "Versteckt" den Context (Implementierungsdetail!) vor der Anwendung
+  * Sieht aus wie fachliche API
+  * Kann (vergleichsweise einfach) gemockt werden
+---
+###  Zugriff mit Custom Hook in TypeScript
+* Beim Erzeugen des Context muss man (in TypeScript) einen Default Context angeben:
+* ```typescript
+  const defaultContext: IAuthContext = {
+      // Dummy-Implementierung vom Default Context
+      username: null, onLogin() {}
+  }
+  const AuthContext = React.createContext<IAuthContext>(defaultContext);
+  ```
+* Das ist nicht immer (sinnvoll) möglich, so dass man auch `ContextType | null` verwenden könnte:
+* ```typescript
+  const AuthContext = React.createContext<IAuthContext | null>(null);
+  ```
+* Nun liefert `useContext` aber immer auch `null` zurück, so dass die Verwendung jedes Mal überprüft werden muss:
+* ```typescript
+  function UserBadge() {
+    const { username } = useContext(AuthContext); // ERR: Property 'username' does not exist on type 'IAuthContext | null'
+  }
+  ```
+ 
+* Mit dem Custom Hook kann eine Plausibilitätsprüfung durchgeführt werden und ggf. ein sprechender Fehler erzeugt werden:
+* ```typescript
+  
+  export function useAuthContext(): IAuthContext {
+    const authContext = useContext(AuthContext);
+
+    if (authContext === null) {
+      throw new Error("AuthContext not correctly initialized. Please wrap your application in a AuthContextProvider component");
+    }
+
+    return authContext;
+  }            
+  ```  
+
+---
+### Ein "halbglobaler" Context
+<!-- .slide: class="left" -->
+* Ein Formular hat eine beliebige Menge von Feldern und Button
+* Kann man da mit Context was machen? 🤔
+
+* ```typescript
+  
+    type FormState = Record<string, string>;
+
+    function PersonForm() {
+      const [formState, setFormState] = React.useState<FormState>({});
+
+      function onClearForm() {
+        setFormState({});
+      }
+
+      function onFieldChange(fieldname: string, value: string) {
+        setFormState({
+          ...formState,
+          [fieldname]: value
+        });
+      }
+
+      return (
+        <Container title="PersonForm">
+          <FieldSet>
+            <Input name="firstname" formState={formState} onFieldChange={onFieldChange} />
+            <Input name="lastname" formState={formState} onFieldChange={onFieldChange} />
+          </FieldSet>
+          <ClearButton onClearForm={onClearForm} />
+        </Container>
+      );
+    }
+
+  ```
+
+---
+## Übung: Ein Formular-Context
+
+* *Baue einen Kontext, der Daten eines Formulars hält und diese verändern kann*
+* Schritte:
+  * In `context-example/context-workspace` bitte Abhängigkeiten installieren und npm starten:
+  * ```bash
+    cd context-example/context-workspace
+
+    npm install
+    npm start 
+    ```
+  
+* In der `App.tsx`-Datei ist ein Formular implementiert (ohne Kontext).
+* Die Formulardaten und Callback-Funktionen sollen in einen Kontext.
+* Nähere Informationen findest Du direkt in der Datei.
+* Mögliche Lösung findest Du in `steps/10_PersonForm_mit_context.tsx`
+* Wenn Du fertig bist, bitte "Hand heben" in Zoom 🙋‍♀️
+
+---
+### Formular-Beispiel: was gäbe es für eine Alternative?
+
+* Wenn wir _keinen_ Kontext haben wollen, aber ein wiederverwendbares Formular "Framework"? 🤔
+
+* Man könnte `formState` und die Funktionen zum Ändern in einen Custom Hook packen
+* ```typescript
+    function useForm() {
+      const [formState, setFormState] = React.useState<FormState>({});
+
+      function onClearForm() {
+        setFormState({});
+      }
+
+      function onFieldChange(fieldname: string, value: string) {
+        setFormState({
+          ...formState,
+          [fieldname]: value
+        });
+      }
+
+      return { formState, onClearForm, onFieldChange };
+    }
+
+    function PersonForm() {
+      const { formState, setFormState, onFieldChange } = useForm();
+
+      return (
+        <div>
+          <FieldSet>
+            <Input name="firstname" formState={formState} onFieldChange={onFieldChange} />
+            <Input name="lastname" formState={formState} onFieldChange={onFieldChange} />
+          </FieldSet>
+          <ClearButton onClearForm={onClearForm} />
+        </div>
+      );
+    }  
+  ```
+* Vorteile? Nachteile? 🤔
+
+---
+### Neuerungen in React 19
+<!-- .slide: id="t-react19" --> 
+
+* [React 19](https://react.dev/blog/2024/02/15/react-labs-what-we-have-been-working-on-february-2024) wird im Laufe des Jahres erscheinen
+* Darin wird sich auch die Context API verändern:
+  * Es wird eine `Context`-Komponente geben (ersetzt `Context.Provider`)
+  * `useContext` wird durch den `use`-Hook ersetzt
+  * Der `use`-Hook ist flexibler als die bisherigen Hooks
+  * Kann überall verwendet werden (z.B. in `if`)
+  * Das ganze ist (weitgehend) abwärtskompatibel! 
+* Die APIs `useCallback`, `useMemo` und `memo` werden durch den **React Compiler** (ehem. Codename: "Forget") ersetzt
+  * Unklar, ob der Compiler Teil von React 19 wird, da es ein eigenes Projekt ist
+
+---
+### Renderverhalten von Context
+<!-- .element: class="todo" -->Beispiel aus Februar-Schulung übernehmen
+<!-- .slide: id="t-context-render" --> 
+* <!-- .element: class="demo" --> Eine Komponente in den Kontext (`CounterContext`) hinzufügen
+* <!-- .element: class="demo" --> Was passiert und warum? 🤔
+
+---
+### Renderverhalten von Context
+* Die `children` werden fertig übergeben
+* Deren Renderzyklus wird von der Komponente bestimmt, die die `children` erzeugt
+  * Das ist hier der Aufrufer von `Form`
+
+* ```typescript
+    function Form({ children }: FormProps) {
+      // ...
+      return (
+        <Container title="Form">
+          <FormContext.Provider
+            value={ /* ... */ }
+          >
+            {children}
+          </FormContext.Provider>
+        </Container>
+      );
+    }  
+  ```
+---
+### Renderverhalten von Context #2
+* Unterdrücken von erneutem Rendern
+* <!-- .element: class="demo" --> `CounterDispay` aufteilen in lesen und schreiben
+
+---
+### Wie können wir das Rendern von Konsumenten unterdrücken?
+* Der `Clear`-Button wird immer gerendert, auch wenn der sich gar nicht ändert 😢
+* Woran liegt das?
+* Was müssen wir tun, damit der nicht gerendert wird?
+  * Wenn sich _irgendetwas_ im Kontext ändert, werden _alle_ Konsumenten neu gerendert
+    * Auch wenn sie auf Teile des Kontextes zugreifen, der sich nicht verändert hat.
+  * Um den `Clear`-Button vom Rendern auszuschliessen, muss also die `onClearForm`-Funktion
+    aus dem `FormContext`
+  * Dazu wird ein neuer Context erzeugt. Je nachdem kann eine Komponente dann den einen oder
+    anderen (oder beide) konsumieren.
+---
+### Rendern optimieren
+<!-- .slide: class="left" -->
+* Beispiel: zwei Kontexte für das Formular
+* ```typescript
+    // FormContext wie bisher, aber ohne onFieldChange und ohne onClearForm
+
+    // Neuer Context:
+    type IFormChangeContext = {
+      onClearForm(): void;
+      onFieldChange(fieldname: string, value: string): void;
+    };
+
+    const FormChangeContext = createContext<IFormChangeContext | null>(null);
+  ```
+* ```typescript
+    function Form({ children }: FormProps) {
+      // state + Callback-Funktionen wie bisher
+
+      return (
+        <FormContext.Provider
+          value={{
+            formState
+          }}
+        >
+          <FormChangeContext.Provider value={{ onClearForm, onFieldChange }}>
+            {children}
+          </FormChangeContext.Provider>
+        </FormContext.Provider>
+      );
+    }  
+  ```
+* Geht das?  
+* <!-- .element: class="demo" --> Prüfen!    
+---
+### Memoisieren von Komponenten
+* Wenn eine Komponente gerendert wird, werden grundsätzlich _alle_ Unterkomponenten gerendert
+* Das bedeutet im gezeigten Fall:
+  * beim Rendern von `Form` wird *immer* auch `FormContext.Provider` gerendert und *immer* auch `FormChangeContext.Provider`.
+  * Wir haben also noch nichts gewonnen.
+  * Oder? 🤔
+    * Eventuell haben wir immerhin eine sauberere Architektur durch Trennung in "lesenden" und "modifizierenden" Context
+---
+### Memoisieren von Komponenten  
+* Man kann das Rendern von Komponenten durch "Memoisieren" (eine Art Caching) unterdrücken
+* Komponenten werden dann nur gerendert, wenn sich ihre Properties verändert haben.
+* Variante 1 mit `React.memo`
+* ```typescript
+  const FormChangeContextProvider = React.memo( 
+    function FormChangeContextProvider({ children, onClearForm, onFieldChange }) {
+      return  <FormChangeContext.Provider value={{ onClearForm, onFieldChange }}>
+        {children}
+      </FormChangeContext.Provider>
+    }
+  );
+  ```
+* Für den Verwender ist das transparent:  
+* ```typescript
+  function Form({ children }: FormProps) {
+    // ...
+    return  <FormContext.Provider value={/* ... */}>
+        <FormChangeContextProvider 
+          onClearForm={onClearForm}
+          onFieldChange={onFieldChange}
+          >{children}</FormChangeContextProvider/>
+      </FormContext.Provider>
+  }
+  ```
+* Diese Komponente wird nun neugerendert, wenn sich eines der Properties ändert (`children`, `onClearForm` und/oder `onFieldChange`)
+* Reicht das? 🤔
+---
+### Memoisieren von Komponenten
+* Eine Komponente ist eine Funktion
+* Die Funktion wird bei jedem Rendern neu ausgeführt
+* Alle Dinge, die darin erzeugt werden, sind bei jedem rendern "neu" (neue Referenz)!
+* ```typescript
+  function Form() {
+    const onClearForm = () => setFormState({});
+
+    return ...;
+  }
+  ```
+* `onClearForm` ist bei jedem Rendern von `Form` "neu"
+* Dasselbe gilt für Objekte
+* ```typescript
+  function Form() {
+    const emptyArray = [];
+  ```
+* `emptyArray` ist bei jedem Rendern von `Form` "neu"
+* Wir müssen also dafür sorgen, dass diese Werte und Funktionen "stabil" über mehrere Renderzyklen sind
+---
+### useMemo und useCallback
+* Um Werte über mehrere Renderzyklen zu erhalten, kann man `useMemo` (Werte) und `useCallback` verwenden
+  * (`useCallback` ist eine Vereinfachung von `useMemo` für Funktionen)
+* Die Verwendung von beiden erinnert an `useEffect` 😱:
+  * Es gibt eine Callback-Funktion (die liefert den Wert bzw. die Funktion zurück)
+  * Es gibt ein Dependency-Array, das bestimmt, wann der Wert/Funktion ungültig ist.
+  * Das Dependency-Array _muss_ angegeben werden - im Gegensatz zu `useEffect`. Warum?
+* ```typescript
+  function Form({title, subtitle}) {
+    // Funktion wird nur einmal erzeugt
+    const onClearForm = useCallback( () => setFormState({}), []);
+
+    // Array wird immer neu erzeugt, wenn title oder subtitle sich ändert
+    const titleArray = useMemo( () => { return [title, subtitle] }, [title, subtitle] );
+  }
+  ```
+* Damit haben wir nun unser Problem gelöst?
+---
+### useMemo und useCallback: stale Values
+* Was passiert denn hier:
+* ```typescript
+  function Form() {
+    const [formState, setFormState] = React.useState({});
+
+    const onFieldChange = useCallback(function(fieldname, value) {
+      setFormState({
+        ...formState,
+        [fieldname]: value
+      });
+    }, []);
+  }
+  ```
+* Der Wert von `formState` wird beim erstmaligen rendern innerhalb der Callback-Funktion "eingefroren" 
+* Werte in einer Funktion (Closure) haben immer den Wert von dem Zeitpunkt, zu dem die Funktion ausgeführt wurde
+* Das fällt häufig gar nicht auf
+* Hier schon, denn formState verbleibt immer auf dem ersten Wert 😢
+* Was können wir tun?
+
+---
+### useMemo und useCallback: stale Values
+* Genau wie bei `useEffect` können wir bei `useMemo` und `useCallback` bestimmen, wann der gecachte Wert ungültig ist
+* Im gezeigten Beispiel wäre das, wenn `formState` sich ändert:
+* ```typescript
+    function Form() {
+      const [formState, setFormState] = React.useState({});
+
+      const onFieldChange = useCallback(function(fieldname, value) {
+        setFormState({
+          ...formState,
+          [fieldname]: value
+        })
+      }, [ formState ]);
+    } 
+  ```
+* Ist das gut?
+  * Es kommt drauf an!
+---
+### useMemo und useCallback: stale Values
+* Grundsätzlich kann es richtig sein, bei Änderung von Werten auch neue Werte und Funktionen zu erzeugen
+* Wir wollen ja nicht "für immer" cachen, sondern nur so lange "wie es geht"
+* Im gezeigten Fall würde das für die Form bedeuten:
+  * Immer wenn sich der State ändert, ändert sich `onFieldChange`
+  * Dadurch wird dann auch `FormChangeContextProvider` neu gerendert
+  * Das bedeutet, wir haben nichts gewonnen: wenn sich der Zustand ändert, wir dauch der Clear-Button neugerendert
+---
+### Callback-Funktion von useState
+* Im konkreten Fall können wir weiter optimieren, in dem wir beim Setzen des Zustandes eine Callback-Funktion angeben  
+* Die Callback-Funktion wird von React aufgerufen und ihr wird der _aktuellste_ Werte des States übergeben
+* Die Callback-Funktion liefert dann den neuen State zurück
+* Damit haben wir keinen Wert mehr in der Closure, der "stale" sein könnte, und es reicht, wenn wir die Funktion
+  einmal erzeugen (leeres Dependency Array)
+* ```typescript
+  function Form() {
+    const [formState, setFormState] = React.useState({});
+
+    const onFieldChange = useCallback(function(fieldname, value) {
+      setFormState( () => return {
+        ...formState,
+        [fieldname]: value
+      })
+    }, [ ]);
+  }   
+  ```
+---
+### Memoisieren: memo, useCallback und useMemo
+<!-- .slide: class="left" -->
+* Sollte man das immer und überall machen?
+* Alles mit useMemo und useCallback umschliessen?
+* ```typescript
+  function Greet({name}) {
+    const greeting = useMemo(`Hello, ${name}!`, [name]); // 🤔
+
+    return <h1>{greeting}</h1>
+  }  
+
+  ```
+* Was spricht dafür? Was spricht dagegen? 🤔
+
+---
+### Ausblick: Memoisieren: memo, useCallback und useMemo
+
+* Es soll einen eigenen Compiler für React geben ("React forget")
+* Der soll die Abhängigkeiten für `useCallback` und `useMemo` automatisch erkennen
+* Dann wird die Arbeit damit hoffentlich einfacher
+
+---
+### Übung: Memoisieren von Komponenten
+* Teile den `FormContext` in zwei Teile:
+  * `FormContext`: die beiden Callback-Funktionen entfernen
+  * `FormChangeContext`: hierein die beiden Funktionen zum Modifizieren des Zustands
+* Einzige Änderung im Verhalten: die `ClearButton`-Komponente soll den neuen Kontext verwenden (und sich _nicht_ neu rendern, wenn das Formular ausgefüllt wird)
+* Kannst Du statt der gesehenen `FormChangeContextProvider` eine Lösung mit `React.useMemo` statt `React.memo` bauen? 😳
+* Wenn Du vorhin nicht fertig geworden bist, oder deine Lösung nicht funktioniert, kopiere `steps/10_PersonForm_mit_context.tsx` in deine `App.tsx`-Datei als Basis für die Übung
+* Eine fertige Lösung findest Du in `steps/20_PersonForm_mit_context_und_memo.tsx`
+* Wenn Du fertig bist, bitte die Hand heben ✋
+
+
+          </textarea>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+# Immutable DAten
+* In React funktioniert viel (Change Detection) über immutable Daten
+* Welche Möglichkeiten gibt es in JavaScript?
+* Wie hilft `immer`?
+<!-- .element: class="todo" -->aus anderen Schulungen übernehmen
+# Globales Zustandsmanagement
+
+* Übersicht was gibt es?
+* Woran interscheiden sich die Tools
+  * REdux auch Logik, alle anderen "eher" nur State
+* Zustand
+
+  </textarea
+          >
+        </section>
+
+        <!-- ============================================================================= -->
+
+        <section data-markdown>
+          <textarea data-template>
+# Suspense
+<!-- .element: class="todo" -->"State of the Art": Suspense (am Beispiel TanStack Query)
+<!-- .element: class="todo" -->TS Query Teil entschlacken, Fokus auf Suspense, evtl. mit Transitions (das wäre dann auch concurrent mode)
+<!-- .element: class="todo" -->error boundaries (Teil 1: was sind EBs -> Fehler beim Rendern (!!!), Teil 2: mit Suspense)
+
+---            
+<!-- .slide: id="t-tanstack-query" -->            
+# Mordernes Data Fetching in React
+---
+## Modernes Data Fetching in React
+* Mit `useEffect`, `fetch` und `axios` stehen dir "Low-Level-APIs" zur Verfügung, um mit serverseitigen Daten zu arbeiten
+* Diese APIs sind React (`useEffect`) bzw. Browser (`fetch`) Standard APIs
+* Es gibt aber spezialisierte Bibliotheken, die das Arbeiten mit Daten erleichtern können.
+  * [TanStack Query](https://tanstack.com/query/latest) / und [Vercel SWR](https://swr.vercel.app/): Zwei Bibliotheken zum Laden/Speichern von Daten inklusive Cache-Funktion
+  * [Redux Toolkit Query](https://redux-toolkit.js.org/rtk-query/overview): Arbeiten mit APIs in Redux-Anwendungen
+  * [Apollo GraphQL Client](https://www.apollographql.com/docs/react/): Client für GraphQL APIs mit Cache und Statemanagement Möglichkeiten
+* Diese Bibliotheken haben alle ähnliche Konzepte:
+  * Hooks zum Laden/Speichern von Daten
+  * globales Caching von Daten (auch zur Sicherstellung der konsistenten Darstellung)
+    * Strategien zur Aktualisierung von Daten (auch automatisch im Hintergrund)
+---
+## TanStack Query
+### Schritt-für-Schritt: Laden von Daten mit "TanStack Query"
+
+* 👉 `PostListPage`
+* 👉 später: `PostEditorPage`
+* 👉 später: Custom Hooks 
+* 👉 später: zod
+* 👉 Arbeiten in `advanced/workspace`
+
+
+---
+### Der QueryClient
+
+* Zentrales Konfigurationsobject: `QueryClient`
+* React-unabhängig
+* Wird beim Starten der Anwendung initialisiert
+* Oft reichen Default-Einstellung
+* Es können aber z.B. globale Refetch-Policies eingestellt werden
+* Das Objekt wird per QueryClientProvider in die Anwendung gereicht
+* ```typescript
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false
+      }
+    }
+  });
+
+  root.render(
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  );
+  ```
+
+---
+### Laden von Daten: useQuery
+
+* [Queries](https://tanstack.com/query/latest/docs/react/guides/queries) werden mit dem `useQuery`-Hook ausgeführt
+* [Der `useQuery`-Hook](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery) erwartet ein Konfigurationsobjekt
+  * `queryKey`: Array mit Query Keys (zur Interaktion mit dem Cache)
+  * `queryFn`: Funktion zum Laden der Daten
+  * Weitere Konfigurationen (optional)
+* ```typescript
+  import { useQuery } from "react-query";
+  import { loadBlogPosts } from "./blog-api";
+  function BlogListPage() {
+
+    const result = useQuery({queryKey: ['posts'], queryFn: loadBlogPosts});
+
+    // ...
+  }
+  ```
+---
+### Query Function
+
+* `useQuery` erwartet eine [Query-Function](https://tanstack.com/query/latest/docs/react/guides/query-functions), die den eigentlichen Request ausführt
+* Die Signatur ist fast beliebig, die Funktion muss aber ein Promise zurückliefern:
+* Wenn die Daten erfolgreich geladen wurden, muss das Promise mit den Daten "aufgelöst" werden
+* Wenn es einen Fehler gab, muss die Funktion einen Fehler werfen
+* ```typescript
+  // async function gibt IMMER ein Promise zurück
+  export async function loadBlogPost(postId) {
+    const response = await fetch("http://localhost:7000/posts" + postId);
+
+    if (!response.ok) {
+      throw new Error("Could not load blog post: " + response.status);
+    }
+
+    return response.json();
+  }
+  ```
+
+---
+
+### Rückagebwert von `useQuery` (Query Ergebnis)
+
+* `useQuery` liefert ein Objekt zurück:
+  * `isLoading`: Der Query lädt noch (und es sind keine Daten im Cache)
+  * `isSuccess`: Daten sind geladen
+  * `isError`: Es ist ein Fehler aufgetreten
+  * `data` enthält die geladenen Daten
+  * `error`: Fehlerobjekt aus der Query-Funktion 
+* Weitere [siehe Doku](https://tanstack.com/query/latest/docs/react/reference/useQuery)
+  
+---
+### Query Keys
+
+* Mit den [Query Keys](https://tanstack.com/query/latest/docs/react/guides/query-keys) wird ein Ergebnis im Cache gespeichert
+* Ein Query Key besteht aus einem Array von Werten
+* Üblicherweise ist es ein Name (z.B. "posts") und dann ggf. weitere Parameter, zum Beispiel die Id eines Posts ("P1")
+  oder die Sortierreihenfolge
+  * Also alle Daten, die den Query exakt beschreiben
+* ```typescript
+  import { useQuery } from "react-query";
+  import { loadBlogPosts } from "./blog-api";
+
+  function BlogPage({blogPostId}) {
+
+    // Für jeden Aufruf mit einer neuen blogPostId
+    //  wird das Ergebnis separat in den Cache gelegt
+    const result = useQuery({
+      queryKey: ['blogPost', blogPostId], 
+      queryFn: () => loadPost(blogPostId)
+    });
+
+    // ...
+  }
+  ```
+* Wenn ein Query mit denselben Query Keys in mehr als einer Komponente ausgeführt wird
+* stellt TanStack Query sicher, dass der Query nur einmal ausgeführt wird
+* wenn sich das Ergebnis ändert, werden alle Komponenten, die den Query verwenden,
+automatisch aus dem Cache aktualisiert
+* 👉 dieses Verhalten sehen wir uns später noch an
+
+---
+## Übung: Daten lesen mit TanStack Query
+
+* **Vorbereitung**
+* Workspace in der IDE öffnen: `react18-training/advanced/workspace`
+* Schritt 1: Backend starten
+  * ```bash
+  cd react18-training/blog-example/backend-rest
+  npm start
+  ```
+  * Danach sollte unter [http://localhost:7000/posts](http://localhost:7000/posts) 
+die Liste mit den (JSON-)Posts zurückkommen
+* Schritt 2: Frontend (Vite) starten
+  * ```bash
+  cd react18-training/advanced/workspace
+  npm start
+  ```
+  * Die Anwendung sollte auf [http://localhost:3000](http://localhost:3000) laufen
+  * Die Anwendung benutzt noch `useEffect` und `fetch`... das wollen wir ändern!
+---
+### Übung: Daten lesen mit TanStack Query
+
+* In der Komponente `PostListPage` wird `fetch` bzw. `useEffect` zum Laden der Daten verwendet
+* Stelle diese Komponente auf `useQuery` um.
+* Zeige eine Warte-Meldung an, während die Daten geladen werden
+  * Du kannst den Request künstlich langsam machen, in dem Du an die Url `?slow` hängst
+* TanStack Doku: 
+  * [Queries](https://tanstack.com/query/v5/docs/framework/react/guides/queries)
+  * [useQuery](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery)
+* Mögliche Lösung: `steps/10_useQuery`
+
+---
+### TanStack Query: Mutations
+
+* [Mutations](https://tanstack.com/query/latest/docs/framework/react/guides/mutations) werden verwendet, um Daten zu *verändern* (speichern, löschen)
+* Der entsprechende Hook heißt [`useMutation`](https://tanstack.com/query/latest/docs/framework/react/reference/useMutation)
+* Dessen API ist vergleichbar mit `useQuery`
+* Auch der `useMutation`-Hook liefert Informationen über den Zustand der Mutation zurück
+* ```typescript
+  import { useMutation } from "react-query";
+  import { savePost } from "./blog-api";
+
+  function PostEditorPage() {
+    const mutation = useMutation({
+      mutationFn: savePost,
+      onSuccess() {
+        // optional: wird aufgerufen, wenn die Mutation erfolgreich war
+        // ...
+      }
+    });
+
+    if (mutation.status === "error") {
+      return <h1>Error!</h1>;
+    }
+
+    if (mutation.status === "loading") {
+      return <h1>Saving, please wait!</h1>;
+    }
+
+    // ...
+  }
+  ```
+---
+### TanStack Query: Mutations  
+* Im Gegensatz zu `useQuery` wird eine Mutation aber nicht automatisch ausgeführt, sondern wird explizit gestartet
+* Dazu liefert `useMutation` die Funktion `mutate` zurück
+* Übergeben wird der Funktion die zu schreibenden Daten
+* ```typescript
+  const mutation = useMutation(/* ... */ );
+
+  function saveBlogPost(newPost: NewBlogPost) {
+    mutation.mutate(newPost);
+  }
+  ```
+---
+### Parameter für die Mutations
+* Üblicherweise benötigt eine Mutation Daten, die erst bei der Ausführung `mutate` feststehen
+* Dazu kann der `mutate`-Funktion genau **ein** Parameter übergeben werden
+* Wie dieser aussieht bestimmt ihr in der Definition der Mutation selbst
+* Dieser Parameter entspricht nämlich dem ersten Parameter der `mutationFn`:
+  * ```typescript
+    const addPostMutation = useMutation({
+      mutationFn(newBlogPost: NewBlogPost) { /* ... */ }
+    })
+    ```
+* Wenn ihr mehr als einen "logischen" Parameter benötigt, müsst ihr ein Objekt verwenden:
+* ```typescript
+  type AddCommentParam = { postId: string, comment: string };
+
+  const addCommentMutation = useMutation({
+    mutationFn(param: AddCommentParam) {
+      const url = `/api/posts/${postId}/comments;
+      fetch(url, { 
+        body: JSON.stringify({comment: param.comment})
+      });
+    }
+  });
+  ```
+
+---
+### Arbeiten mit dem Ergebnis
+
+* Wenn eine Mutation ausgeführt wurde, bekommt ihr `data` bzw. `error` zurück
+* Damit könnt ihr - wie bei `useQuery` - nach der Ausführung einer Mutation die UI aktualisieren, um zum Beispiel Fehlermeldungen anzuzeigen
+* ```typescript
+  function PostEditor() {
+    const savePostMutation = useMutation(/*...*/);
+
+    return <form>
+      { /* ... */}
+
+      {saveMutation.isError && <p>Fehler beim Speichern des Posts: {String(saveMutation.error)}</p>}
+      {saveMutation.isSuccess && <p>Der Blogpost wurde erfolgreich gespeichert!</p>}
+    </form>
+  }
+  ```
+---
+### Auf das Ergebnis warten
+* Um direkt nach Beendingung einer Mutation weitere Aktionen auszuführen, kann man `on`-Callback-Funktionen bzw. [`mutateAsync`](https://tanstack.com/query/latest/docs/framework/react/guides/mutations#promises) verwenden
+* `onSuccess` und `onFailure` könnt ihr bei `useMutation` angeben. Das ist sinnvoll für Aktionen, die immer ausgeführt werden sollen
+  * Sehen wir später noch im Zusammenhang mit Caching.
+* Mit `mutateAsync` könnt ihr _in einer Komponente_ auf das Ergebnis der Mutation warten. Das ist sinnvoll, wenn man Komponenten-spezfische Aktionen ausführen möchte.
+* `mutateAsync` liefert ein Promise mit den Daten der Mutation zurück.
+* Schlägt die Mutation fehl, wird das Promise nicht verworfen (rejected)
+* Beispiel:
+* ```typescript
+  function PostEditor() {
+    const navigate = useNavigate(); // vom React Router
+
+    const savePostMutation = useMutation({ /* ... */ });
+
+    async function savePost(newPost: NewPost) {
+      const result = await savePostMutation.mutate(newPost);
+      // result ist hier das Ergebnis der (erfolgreichen) Mutation
+
+      navigate("/"); // nach erfolgreicher Mutation zurück auf die Landingpage
+    }
+
+    // ...
+
+  }
+  ```
+
+
+---
+### Zurücksetzen einer Mutation
+
+* Wenn eine Mutation ausgeführt wurde, ist `status`, `data`, `error` usw. gesetzt
+* Mit `reset` kann man diese Informationen zurücksetzen
+* Das kann zum Beispiel nach einem Fehler sinnvoll sein, um die Fehlermeldung wieder verschwinden zu lassen
+  * Zum Beispiel nach einer Benutzer-Interaktion
+* Dann ist die Mutation "wie neu"
+* ```typescript
+  function PostEditor() {
+    const addPostMutation = useMutation(/* ... */);
+
+    return <form>
+      { /* ... */ }
+
+      <input onChange={e => {
+        addPostMutaton.reset();
+        // ...
+      }} />
+
+      { /* ... */ }
+    </form>
+  }
+  ```
+
+
+
+---
+## Übung: Neue Blogposts auf den Server schreiben
+
+* Die `PostEditor`-Komponente verwendet noch `fetch` um den neuen BlogPost zu speichern
+* Stelle die Komponente auf TanStack Query bzw. den `useMutation`-Hook um
+* Wenn die Mutation erfolgreich war und der Blogpost gespeichert wurde, soll die Landing-Page (`/`) gerendert werden
+  * Das entspricht dem bisherigen Verhalten, der Code mit `useNavigate()/navigate` ist bereits in der Komponente
+  * Der neue Post wird dort erst nach einem manuellen Refresh der Seite angezeigt. Das optimieren wir später.
+* Optional: Wenn es einen Fehler gibt, soll eine Fehlermeldung ausgegeben werden
+  * Du kannst Fehler beim Speichern provozieren, in dem Du einen Titel eingibst, der kürzer als fünf Zeichen lang ist
+* Optional: Wenn es einen Fehler gab und der Benutzer danach etwas in eines der Textfelder eingibt, soll die Fehlermeldung wieder verschwinden
+* Mögliche Lösung `steps/20_useMutation`
+---
+## Custom Hooks
+* Custom Hooks sind "normale" JavaScript/TypeScript-Funktionen, die aber andere (React-) Hooks (z.B. `useState`) verwenden können
+* Custom Hooks können für Code verwendet werden, der wiederverwendet werden soll
+* Der Name einer Hook-Funktion muss mit `use` anfangen
+* Die Signatur einer Hook-Funktion (Rückgabe-Wert und Parameter) kannst du frei wählen. 
+  * Allerdings dürfen Hook-Funktionen nicht asynchron sind
+---
+### Custom Hooks mit TanStack Query
+* Wenn Du einen Query in mehreren Komponenten verwenden willst, kannst Du dessen Code in Custom Hooks auslagern
+* Selbst wenn du einen Query nur in einer Komponente verwendest, kann es sinnvoll sein, diesen auszulagern:
+  * Man kann ihn insoliert testen
+  * Der "technische" Code der Komponente wird verringert, was evtl. zu besserer lesbarkeit führt
+
+* ```typescript
+  function useBlogListQuery() {
+    return useQuery({ /* ... */ });
+  }
+
+  function PostListPage() {
+    const result = useBlogListQuery();
+  }
+
+  function App() {
+    const result = useBlogListQuery();
+  }
+  ```
+---
+## Übung: Ein Custom Hook zum Laden eines einzelnen Blog-Post
+* In der `PostPage` soll der gewählte Post mit einem Query geladen werden.
+* Außerdem soll (neu!) in der Sidebar der Post mit der Id `P10` geladen und angezeigt werden
+* Kannst du einen eigenen Hook bauen, der den BlogPost mit einer angegebene Id lädt?
+  * Den `fetch`-Code für die `queryFn` kannst Du aus `PostPage` übernehmen
+* Stelle dann `PostPage` um, so dass diese Komponente deinen Hook verwendet
+* Verwende dann deinen Hook um in `Sidebar` das Blog-Post mit Id `P10` zu laden und daraus `title` und `likes` anzuzeigen
+* Lösung: `steps/30_custom_hook` 
+  
+---
+## Validieren von Daten
+
+---
+### Validieren von Daten
+* <!-- .element: class="demo" --> Außerhalb des Projektes, in einer TypeScript-Datei:
+* <!-- .element: class="demo" --> fetch-Ergebnis ist any in TypeScript
+* <!-- .element: class="demo" --> zod
+---
+### Validieren von Daten
+<!-- .slide: class="left" -->
+- Das Ergebnis eines `fetch`-Calls ist aus TypeScript-Sicht ein Promise von `any`
+- Wir können das Ergebnis also verwenden, ohne weitere Typ-Angaben zu verwenden:
+* ```typescript
+  async function loadPost(postId: string) {
+    const response = await fetch("...");
+    const data = await response.json();
+    //      ^-- data ist 'any'
+    return data;
+  }
+  ```
+- Mit `data` bzw. dem Rückgabewert von loadPost können wir alles machen - unabhängig davon, ob das richtig ist oder nicht:
+* ```typescript
+  const data = await loadPost("P10");
+  const title = data.title; // wahrscheinlich ok, weil title in blog post vorhanden ist
+  const blogPost = data[2]; // wahrscheinlich nicht ok, weil data kein Array ist
+  const title = data.toUpperCase(); // wahrscheinlich nicht ok, weil data kein string ist
+  ```
+* Wir haben hier keinen Support von TypeScript!  
+---
+### Validieren
+<!-- .slide: class="left" -->
+* Wir können einen Typecast verwenden, um TypeScript den Rückgabe-Typen mitzuteilen:
+* ```typescript
+  async function loadPost(postId: string): Promise<BlogPost> {
+    const response = await fetch("...");
+    const data = await response.json();
+    //      ^-- data ist 'any'
+    return data as BlogPost;
+    //          ^--  Typecast
+  }
+  ```
+* Ist das gut? Welche Probleme könnte es nun geben? 🤔
+---
+### Typecast vs. Validierung
+<!-- .slide: class="left" -->
+- Mit einem Typecast sagen wir TypeScript welchen Typ eine Variablen haben soll
+* Das kann richtig oder falsch sein:
+* ```typescript
+  const s:string = "Hallo";
+  let y:any = s;
+  let x:number = y as number; 🙀
+  ```
+- In unserem Beispiel sind wir uns sicher, dass `data` ein `BlogPost`-Objekt ist.
+* Oder? 🤔
+---
+### Validierung
+<!-- .slide: class="left" -->
+* Die Daten, die von einem Server (oder auch aus Benutzereingaben) kommen, können von TypeScript nicht überprüft werden
+* TypeScript ist zu Laufzeit "weg"
+* Wenn der Server also Daten schickt die - entgegen unserer Erwartung - nicht zu dem passen, was wir als TypeScript-Typ definiert haben, merken wir das nicht
+  * (abgesehen davon, dass die Anwendung irgendwann in Fehler läuft)
+* Besser wäre bei solchen Daten eine echte Laufzeit-Validierung
+* Dabei werden die gelesen Daten nach dem Empfang überprüft:
+* ```typescript
+  async function loadPost(postId: string): Promise<BlogPost> {
+    const response = await fetch("...");
+    const data = await response.json();
+    if (typeof data !== "object") {
+      // Fehler!
+    }
+    if (!"title" in data) { /* Fehler! */ }
+    if (!"body" in data) { /* Fehler! */ }
+    // ...
+    // ok: data ziemlich sicher BlogPost
+    return data as BlogPost;
+  }
+  ```
+* Ist das schön?
+---
+### Probleme mit manueller Validierung
+
+* Validierung kann viel Code in Anspruch nehmen
+* Außerdem redundant: 
+  * wir müssen den Code zur Validierung schreiben (Laufzeit)
+  * wir müssten den TypeScript-Code schreiben (Buildzeit)
+---
+### Validierungsbibliothek: zod
+<!-- .slide: class="left" -->
+- Mit [zod](https://zod.dev) gibt es eine Validierungsbibliothek, die beides verbindet
+- Mit (JavaScript)-Code, der auch zur Laufzeit ausgeführt wird, wird ein **Schema** beschrieben
+- Dieses Schema kann zur Laufzeit verwendet werden, um ein beliebiges Objekt zu validieren
+- Außerdem kann aus dem Schema ein TypeScript-Type für die Build-Zeit abgeleitet werden
+* ```typescript
+  import { z } from "zod";
+
+  const UserSchema = z.object({
+    username: z.string(),
+    email: z.email(),
+    nickname: z.string().nullish()
+  });
+  ```
+---
+### Zod
+* Mit dem `z`-Objekt lassen sich Typen (einfache und komplexe) beschreiben
+* Objekte werden mit [`z.object`](https://zod.dev/?id=objects) beschrieben
+* Dabei kann man nicht nur Typen angeben ([`string`, `number`](https://zod.dev/?id=primitives), `email`, ....) sondern auch Wertebeschränkungen
+  * [Mindestlänge, Maximallänge](https://zod.dev/?id=minmaxlength), erlaubte Zeichen etc.
+* Mit der [`parse`-Methode](https://zod.dev/?id=parse) am `Schema`-Objekt kann dann ein beliebiges Objekt validiert werden.
+* Wenn das Objekt nicht dem Schema entspricht, wird ein Fehler geworfen
+* Wenn alles in Ordnung ist, kommt das validierte Objekt zurück
+* ```typescript
+  const potentialUser = await loadUser("U1");
+
+  const user = UserSchema.parse(potentialUser);
+  ```
+* Dadurch ist auch TypeScript der Typ bekannt!
+* ```typescript
+  type User = { username: string; email: string; nickname?: string | null };
+  const user: User = UserSchema.parse(potentialUser);
+                     // ^--- ok
+  
+  ```
+---
+### Zod: Ableiten des TypeScript-Typen  
+* Den TypeScript-Typen müssen wir gar nicht selber schreiben, dass kan zod für uns machen:
+* ```typescript
+  export const UserSchema = z.object({ /* ... */ });
+  export type User = z.infer<typeof UserSchema>
+  ```
+---
+### Übung: zod
+
+* Erweitere deinen Custom-Hook zum Laden eines BlogPosts um die Validierung mit zod!
+* Definiere das Schema des BlogPost-Objektes (als Vorlage soll der fertige `BlogPost`-Type in `types.ts` dienen)
+* Das `title`-Feld soll eine Maximallänge von 40 Zeichen haben.
+* Das `likes`-Feld muss optional sein!
+* Nach dem Laden der Daten mit TanStack Query soll das geladenen Objekt dann validiert werden
+  * Wenn Du den Post "Something to remember when learning new tech" (ID: "P5") öffnest, sollte eine Fehlermeldung erscheinen, weil dessen Titel länger als 40 Zeichen ist
+  * Das dauert eine Zeit, weil TanStack Query bei einem Fehler automatisch mehrere weitere versuche unternimmt, die Daten zu laden
+  * Erst danach wird dann die Fehlermeldung gerendert
+* Lösung: `steps/32_zod`
+
+
+
+---
+### Caching
+
+* Alle gelesenen Daten werden in einem globalen Cache gehalten
+* 👉 Dev Tools!
+* Es gibt verschiedene Strategien, wie die Daten im Cache aktualisiert werden
+
+---
+### (Automatisches) Aktualisieren von Daten
+
+* Alle Query-Ergebnisse von `useQuery` werden automatisch gecached
+* Alle Komponenten werden aktualisiert, wenn sich der Cache aktualisiert
+* Alle Daten im Cache werden als "stale" (veraltet) angesehen
+* [Per Default](https://tanstack.com/query/latest/docs/react/guides/important-defaults) werden Queries deswegen automatisch neu ausgeführt:
+* Komponente wird (neu) gemounted
+* Browser-Fenster bekommt den Focus
+* Nachdem das Netzwerk offline war
+
+---
+
+### Manuelles Aktualisieren von Queries
+
+* Queries können per API manuell erneut ausgeführt werden
+* Das kann zum Beispiel nach einer Mutation sinnvoll sein, um die geänderten/gespeicherten Daten 
+im Cache zu aktualisieren
+* Dazu wird die Funktion [`invalidateQueries`](https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries) vom `QueryClient` verwendet
+* Übergeben werden die Query Keys, deren Queries erneut ausgeführt werden sollen
+* ```typescript
+  import { useMutation, useQueryClient } from "react-query";
+  import { savePost } from "./blog-api";
+
+  function PostEditorPage() {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+      mutationFn: savePost, 
+      onSuccess() {
+        // PostPage-Query erneut ausführen, wenn Mutation erfolgreich war
+        queryClient.invalidateQueries(['posts']);
+      }
+    });
+
+    // ...
+  }
+  ```
+
+---
+
+### Beispiel: Blog-Post nicht neuladen
+
+* Ein einzelnes BlogPost kann im Cache verbleiben, da es sich in unserer App nicht ändert/nicht ändern kann
+* Mit den `refetch`-Funktionen kann die automatische Aktualisierung ausgeschaltet werden
+* ```typescript
+  function PostPage() {
+    // ...
+    const result = useQuery({queryKey: ["blogPost", postId], queryFn: () => loadBlogPost(postId)}, {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false
+    });  
+
+    // ...
+  }
+  ```
+
+---
+
+### Refetch
+
+* Das von `useQuery` zurückgeliefert Objekt enthält auch eine `refetch`-Funktion um einen Query
+manuell neu auszuführen
+* ```typescript
+  function PostListPage() {
+    const result = useQuery({queryKey: ['posts'], queryFn: readPosts}, {
+      // nicht automatisch aktualisieren
+      refetchOnMount: false, refetchOnWindowFocus: false
+    })
+
+    // ... result.status === loading, status === error ... 
+
+    return <div>
+      <button onClick={refetch}>Reload Posts</button>
+      <PostList posts={data} />
+    </div>
+  }
+  ```
+---
+## Übung: Arbeiten mit dem Cache
+* In der `Sidebar` und/oder `Post`-Komponente soll ein Blog-Post "geliked" werden können
+* Kopiere dazu die Datei `material/use-like-mutation.ts` in dein `src`-Verzeichnis
+* Darin ist eine Mutation die für ein angegebenen Blog Post einen "Like" vergibt
+* Füge in der `Sidebar` einen "Like"-Button hinzu, der die Mutation verwendet
+* Stelle sicher, dass die neue "Like"-Anzahl sowohl in der `BlogPost`- als auch in der `Sidebar`-Komponente korrekt dargestellt wird
+  * mit einem reload-Button, mit `invalidateQueries` mit `onSuccess` oder wie auch immer
+* Lösung: `steps/34_caching_mutation`
+
+
+---
+## Suspense
+
+* Suspense ist ein relativ neuer Mechanismus in React, um das Arbeiten mit asynchronem Code (insb. Data Fetching) zu vereinfachen
+* Suspense unterbricht das Rendern, wenn eine Komponente wegen noch fehlender Daten nicht gerendert werden kann
+  * Daten können "normale" Daten sein, die z.B. mit TanStack Query geladen werden
+  * ...oder Source-Code, der mit Lazy Loading erst bei Bedarf nachgeladen wird
+---
+### Suspense für Lazy-Loading
+* Suspense für Lazy-Loading/Code Splitting gibt es schon länger als stabiles Feature in React
+* Bei Lazy Loading wird der Code für eine Komponente erst geladen, wenn er benötigt wird
+* ```typescript
+  import { lazy } from 'react';
+
+  
+  const PostEditor = lazy(() => import('./PostEditor'));
+  ```
+* Der Source-Code für `PostEditor` wird vom Browser erst geladen, wenn die Komponente benötigt bzw. verwendet wird
+* Während der Source-Code geladen wird, muss React einen Platzhalter anzeigen
+* Dazu kann um eine Komponente die `Suspense`-Komponente von React gelegt werden
+* ```typescript
+  const PostEditor = lazy(() => import('./PostEditor'));
+  
+  function PostEditorPage() {
+    // ...
+  
+    return  <React.Suspense> fallback={"Please wait"}>
+      <PostEditor />
+    </React.Suspense>;
+  }
+  ```
+* Hier würde React zunächst die `fallback`-Komponente (`Please wait`) rendern und darstellen, bis der Source-Code für `PostEditor` geladen wurde
+* Danach rendert React die Komponente (`PostEditorPage`) erneut und kann nun den `PostEditor` darstellen.
+
+---
+### Suspense für Daten ("Suspense for Data Fetching")
+* Um Suspense mit fetch o.ä. zu verwenden, muss die eingesetzte Bibliothek Suspense unterstützen
+  * Das können wir in unserem eigenen Code nicht machen
+  * TanStack Query, React Router und der Apollo GraphQL Client unterstützen Suspense in ihren neusten Versionen
+---
+### Suspense mit TanStack Query 
+
+* Die Verwendung mit TanStack Query ist denkbar einfach: ihr verwendet den `useSuspenseQuery`-Hook statt des `useQuery`-Hooks
+* Die Parameter sind dieselben
+* Aber: der Query liefert erst ein Ergebnis, wenn die Daten geladen worden sind (oder im Cache vorhanden sind)
+  * Für die Dauer der Ladezeit muss `Suspense` verwendet werden, um eine Platzhalter-Komponente zu rendern
+  * Für den Fall eines Fehlers muss eine [Error-Boundary-Komponente](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) gesetzt werden
+    * Das ist eine Art try-catch-Mechanismus, mit dem eine React-Anwendung auf Fehler _während des Renderns_ reagieren kann
+
+* ```typescript
+  function Post({postId}) {
+    // hier wird das Rendern von React unterbrochen, bis die Daten da sind:
+    const data = useSuspenseQuery({queryFn: fetch(/*...*/), queryKey: ["post", postId] });
+    // wenn die Anwendung hierher kommt, sind die Daten in jedem Fall vorhanden
+    return ...;
+  }
+
+  function PostPage() {
+    return (
+      <ErrorBoundary fallback={<h1>Loading failed!</h1>}>      
+        <Suspense fallback={<h1>Post P10 loading...</h1>}>
+          <Post postId="P10" />
+        </Suspense>
+      </ErrorBoundary>
+    )
+  }
+  ```
+---
+### Error Boundary
+- Eine Error Boundary-Komponente kann man grundsätzlich selbst bauen
+- Fehler, die beim Rendern unterhalb einer Error-Boundary-Komponente auftreten, werden als eine Art Propertie in die nächsthöhere Error-Boundary-Komponente gegeben
+  - ähnlich wie try/catch
+- Die Komponente kann dann eine Fehlermeldung o.ä. rendern  
+- Ihr könnt damit sehr feingranular steuern, wo Fehler angezeigt werden sollen (wenn _eine_ Abfrage nicht funktioniert, können die anderen weiterlaufen - oder nicht)
+- Es gibt eine fertige, generische Error-Boundary-Komponente: [react-error-boundary](https://www.npmjs.com/package/react-error-boundary)
+- Auch TanStack Query hat eine Error-Boundary-Komponente, [QueryErrorResetBoundary](https://tanstack.com/query/latest/docs/framework/react/reference/QueryErrorResetBoundary)
+  - Mit dieser gibt es die Möglichkeit, einen fehlerhaften Query wiederholen zu lassen (auch durch User-Interaktion, z.B. Button click)
+
+---
+### Priorisierung
+* Mit Suspense könnt ihr einzelne Teile der UI priorisieren
+* Ihr könnt z.B. steuern, welche Teile schon dargestellt werden sollen, auch wenn noch andere Daten fehlen
+* ...oder das auf _alle_ Daten gewartet werden soll
+* Was jeweils "richtig" ist, hängt von den fachlichen Anforderungen ab
+---
+### Priorisierung
+* In der `PostPage` werden Daten aus zwei Requests benötigt: der Blog-Post und Informationen über dessen Autoren
+* Beide Requests können zeitgleich (oder nacheinander) gestartet werden
+* Durch das Festlegen der Suspense-Komponente könnt ihr ausdrücken, welche Teile wichtig sind (sofort rendern, sobald Daten da sind), oder "unwichtig"
+* Was passiert hier:
+* ```typescript
+  function PostPage() {
+    const {data: user} = useSuspenseQuery(/* User */);
+    const {data: post} = useSuspenseQuery(/* Post */);
+
+    // ...
+  }
+  ```
+* React rendert Komponente bis zum ersten `useSuspenseQuery`
+* Wenn die Daten da sind, wird die Komponente nochmal gerendert
+* Diesmal bis zum zweiten `useSuspenseQuery`
+* Die Daten werden also *nacheinander* nicht *parallel* geladen. 😢
+---
+### Priorisierung mit TanStack Query
+* Um die Daten parallel zu laden, könnt ihr TanStack Query anweisen, Daten in den Cache zu laden, *ohne* darauf zu warten
+* Dazu verwendet ihr `QueryClient.ensureData`, das die selben Parameter wie `useSuspenseQuery` bzw. `useQuery` entgegennimmt
+* TanStack Query startet dann den Request im Hintergrund (und legt die Daten in den Cache, sobald sie vorliegen)
+* Um also *nicht* auf die User-Daten zu warten könnt ihr folgendes tun:
+* ```typescript
+  function PostPage({postId}) {
+    const queryClient = useQueryClient();
+    queryClient.ensureData({queryFn: /* ... */, queryKey: ["post", postId, "user"]}); 
+    const {data: post} = useSuspenseQuery(/* Post */);
+
+    return ...;
+  }
+  ```
+* Hier werden beide Requests gestartet und React wartet dann auf das Ergebnis des Post-Queries
+* In einer weiteren Komponente könntet ihr dann auf die User-Daten warten, die im besten Fall dann sogar schon im Cache sind:
+* ```typescript
+  function User({postId}) {
+    // Query-Key muss mit dem Query-Key von oben übereinstimmen!
+    const data = useSuspenseQuery({queryFn: /* ... */, queryKey: ["post", postId, "user"]}); 
+
+    // User-Daten rendern
+
+    return ...;
+  }
+  ```
+---
+## Übung: Suspense
+
+* Die `PostPage` soll den BlogPost *und* User-Daten anzeigen
+* Die Queries für das Laden der User-Daten sind bereits fertig 
+  * kopiere bitte die Dateien `material/use-user-query.ts` und `material/UserDetails.tsx` in dein `src`-Verzeichnis
+* Integriere die `UserDetails`-Komponente in die `PostPage`-Komponente  
+  * Lege darum herum eine `Suspense`-Komponente. 
+* Stelle nun `get-post.ts` auf `useSuspenseQuery` um
+* Kannst Du die `PostPage`-Komponente so bauen, dass...
+  - ...beide Komponenten (Post und UserDetails) erst gerendert werden, wenn für *beide* Komponenten die Daten geladen wurden
+  - ...die Komponenten jeweils sofort gerendert werden, wenn ihre jeweiligen Daten vorhanden sind
+* Hinweise:
+  * Du kannst Du Lade-Zeiten mit `?slow=TIMEOUT_IN_MS` in den URLs verzögern
+  * Am besten funktioniert Suspense, wenn Du erst die Blogliste aufrufst, und dort dann einen BlogPost anklickst
+* Lösung: `steps/45_suspense_02`
+---
+## Ausblick: Routing mit Data Fetching
+
+* Der React Router ist ebenfalls in der Lage, das Laden von Daten für eine Route zu koordinieren
+* Das geht mit oder ohne Suspense
+* Dazu gebt ihr bei der Routen-Definition einer `loader`-Funktion an
+* Dieser Funktion werden die Routen-Parameter übergeben.
+* Sie liefert ein Promise mit den zu ladenen Daten zurück
+* ```typescript
+  <Route path="/post/:postId" 
+    loader={ async (params) => { /* fetch ... */ } }
+    component={PostPage} 
+  } />
+  ```
+* Auf die gelesenen Daten könnt ihr dann in der Komponente mit `useLoaderData` zugreifen:
+* ```typescript
+  function PostPage() {
+    const post = useLoaderData(); // Rückgabewert der loader-Funktion
+  }
+  ```
+* Um Caching etc. zu verwenden könnt ihr in der `loader`-Funktion auch  den `QueryClient` von TanStack Query verwenden, um die Daten zu verwenden
+* Ist das eine gute Idee? 🤔
+
+
+<!-- 
+
+## Übung: Die Blog-Anwendung mit TanStack Query
+
+* _Vervollständige den Query zum Laden und Speichern mit TanStack Query_
+* Backend starten
+* Das Backend ist bereits fertig. Du kannst es starten mit:
+* ```
+cd blog-example/backend-rest
+npm install (nur, falls noch nicht gemacht)
+npm start
+```
+* Danach sollte unter [http://localhost:7000/posts](http://localhost:7000/posts) 
+die Liste mit den (JSON-)Posts zurückkommen
+* Schritte:
+* Kopiere `index.js` und `App.js` aus `material/4-remote-query` in dein `src`-Verzeichnis
+* In `App.js` findest Du TODOs mit weiteren Hinweisen
+* Mögliche Lösung findest Du in `steps/4-remote-query`
+* Wenn Du fertig bist, bitte "Hand heben" in Teams 🙋‍♀️
+
+--- -->    
+  </textarea
+          >
+        </section>
+
+        <!-- ============================================================================= -->
+        <section>
+          <h2>Geschafft! 😊</h2>
+          <h3>Vielen Dank für Eure Teilnahme!</h3>
+          <h3>Viel Spaß und Erfolg mit React!</h3>
+          <p>Wenn ihr noch Fragen habt, könnt ihr mich erreichen:</p>
+          <p>Mail: <a href="mailto:nils@nilshartmann.net">nils@nilshartmann.net</a></p>
+          <p>
+            Web: <a href="https://nilshartmann.net" target="_blank">https://nilshartmann.net</a>
+          </p>
+          <p>
+            Twitter: <a href="https://twitter.com/nilshartmann" target="_blank">@nilshartmann</a>
+          </p>
+        </section>
+      </div>
+    </div>
+
+    <script src="slides/revealjs/reveal.js/dist/reveal.js"></script>
+    <script src="slides/revealjs/reveal.js/plugin/notes/notes.js"></script>
+    <script src="slides/revealjs/reveal.js/plugin/markdown/markdown.js"></script>
+    <script src="slides/revealjs/reveal.js/plugin/highlight/highlight.js"></script>
+    <script src="slides/revealjs/config.js"></script>
+  </body>
+</html>
