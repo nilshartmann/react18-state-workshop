@@ -9,4 +9,6 @@ test("todo", async () => {
   //  - Implementiere mindestens einen Test
   //  - Die Art und Weise, wie du testest, kannst Du selbst entscheiden
   //     - warum hast Du dich wofür entschieden?
+  //  - was musst Du beim Testen des Stores beachten, wenn Du mehr als EINEN
+  //    Test schreibst, der den Store verwendent?
 });

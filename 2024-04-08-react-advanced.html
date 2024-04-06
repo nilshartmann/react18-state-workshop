@@ -1685,7 +1685,7 @@ render(
 * Diese Funktionen stehen dir natürlich auch außerhalb von Tests zur Verfügung.
 ---
 ### Testen deiner Hooks
-* Den `useXyzStore`-Hook bzw. deine Custom Hooks kannst Du wie gewohnt testen
+* Den `useXyzStore`-Hook bzw. deine Custom Hooks kannst Du wie gewohnt mit `renderHook` testen
 * Auch hier gilt: der Store ist global und du musst ihn nach dem testen zurücksetzen
 * ```typescript
   test("01 useMessage test", async () => {
@@ -1716,12 +1716,15 @@ render(
   ```
 ---
 ### Übung: Testen eines Zustand Stores
-* **Schreibe Tests für deinen Store**
+* *Schreibe Tests für deinen Store*
 * Überlege dir, was sinnvolle Tests wären
 * Wähle die Teststrategie, die dir am meisten zusagt
   * Du kannst eine Komponente testen, die den Store verwendet
   * und/oder Du kannst die Hooks direkt testen
-*
+* In `30_zustand_intro/workspace/src/__test__/` findest Du bereits eine Testdatei, die Du als Vorlage verwenden kannst
+* Bei Fragen immer fragen!
+* Fertige Tests als "Inspiration" findest Du in `material/05_solution_mit_test`
+* Wenn Du fertig bist, bitte die Hand heben ✋
   </textarea
           >
         </section>
