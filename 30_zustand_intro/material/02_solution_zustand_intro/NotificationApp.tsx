@@ -2,7 +2,7 @@ import Container from "./Container.tsx";
 import {
   useNotificationMessage,
   useNotificationStore,
-} from "./NotificationStore.tsx";
+} from "./NotificationContext.tsx";
 import { useShallow } from "zustand/react/shallow";
 
 export default function NotificationApp() {
@@ -20,7 +20,7 @@ export default function NotificationApp() {
 
 function NotificationBar() {
   // TODO: Lies die aktuelle Nachricht aus dem Store uns zeige sie unten an
-  const { message } = useNotificationContext();
+  const message = useNotificationMessage();
 
   return (
     <Container title={"NotificationBar"}>

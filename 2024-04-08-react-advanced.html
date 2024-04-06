@@ -1591,7 +1591,129 @@ render(
 * Eine Lösung findest Du in `material/02_solution_zustand_intro`
 * Bei Fragen: fragen 😊
 * Wenn Du fertig bist, bitte die Hand heben ✋
+---
+### Konsequenzen bzw. Änderungen gegenüber dem Context
+* Wir können mit "abgeleiteten" Daten arbeiten, das verhindert Redundanzen
+  * `message` z.B. braucht **nicht** mehr im Store zu sein, weil wir jedesmal über `messageId` und `lang` die "fertige" Message auswählen können
+* Wir sparen durch die Selektoren Renderzyklen
+* Im Gegensatz zu Context ist der Store immer global.
+  * Context kann auch in einer Teil-Hierarchie der Anwendung verwendet werden
+  * Das geht mit Zustand zwar auch, aber nur umständlich: https://docs.pmnd.rs/zustand/guides/initialize-state-with-props
+---
+### "Berechnete" Daten
+* Wir haben bei den Selektoren gesehen, dass Du nicht unbedingt die "Rohdaten" aus dem Store auswählen musst
+* Du kannst auch "berechnete" oder "abgeleitete" Daten auswählen
+* ```typescript
+  const isSenior = useEmployeeStore( s => s.position === 'senior' );
+  ```
+* Damit kannst Du das Rendering deiner Anwendung optimieren (Re-renderings einsparen)
+* 🤔 Wo macht das in unserem `NotificationStore` Sinn?  🤔
+* 🤔 Welche Alternativen gibt es zur Auswahl direkt in einer Komponente? 🤔
+* 🤔 Wann wären Custom Hooks sinnvoll? 🤔
+  * Beispiel: Die `messageId` in unserem Store ist prinzipiell für jeden einsehbar
+  * Das können wir zwar nicht ändern, aber mit einem Custom Hook (z.B. `useNotificationMessage`) wäre es klar(er),
+            dass die Message nicht direkt ermittelt werden kann bzw. muss
+  * Man könnte z.B. als Konvention festlegen, dass Daten aus einem Store **immer** nur per Custom Hook ausgewählt werden? 🤔
+  * Man könnte einen Custom Hook bauen, der alle **Actions** eines Stores liefert? Warum? 🤔
+---
+### Testen von Zustand-Stores
+* Du kannst deine Anwendung wie gewohnt mit Jest/Vitest und Testing Library testen
+* Du kannst entweder Komponenten testen, die den Store benutzen oder die Store-Hook-Funktionen oder deine Custom Hook-Funktionen
+* ⚠️ Beim Test musst du bedenken: **der Store ist global** und wird **nicht zurückgesetzt *zwischen* einzelnen Tests**!
+* ```typescript
+  test("01 initial", async () => {
+    render(<NotificationApp />);
 
+    // ⚠️  Initial State: "Keine Notification" sichtbar (messageId: null)
+    expect(
+      screen.getByRole("heading", { name: /Keine Notification/i }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /not_found/i }));
+
+    // Im Store ist jetzt messageId auf 'not_found' gesetzt...
+  });
+
+  test("02 second", async () => {
+    render(<NotificationApp />);
+
+    // ⚠️  Da der Store nicht zurückgesetzt wird,
+    //     ist "Keine Notification" hier NICHT sichtbar,
+    //     wenn beide Tests hintereinander ausgeführt werden, ist dieser Test daher "rot"
+    // ⚠️  Wenn dieser Test einzeln ausgeführt wird, ist er "grün", weil der Store
+    //     dann den Initial-State hat
+    expect(
+      screen.getByRole("heading", { name: /Keine Notification/i }),
+    ).toBeInTheDocument();
+  });
+  ```
+---
+### Testen: Zurücksetzen des States
+* Du solltest nach (oder bevor) einem Test den State wieder auf dessen initial Zustand setzen
+* Dazu kannst Du die Funktion `getInitialState` verwenden, die auf deinem Store definiert ist
+* ```typescript
+  act(() =>
+    useNotificationStore.setState(useNotificationStore.getInitialState()),
+  );
+  ```
+* Das kannst Du in einer `beforeEach` oder `afterEach`-Funktion machen
+* In der Zustand Doku [ist beschrieben](https://docs.pmnd.rs/zustand/guides/testing#setting-up-zustand-for-testing) wie du
+            das automatisiert für *alle* deine Stores nach **allen** Tests automatisch tun kannst
+  * Je nach Anwendungsfall würde ich mich entscheiden, ob sich der Aufwand lohnt, oder man es manuell zurücksetzt
+---
+### Testen: Manipulieren des States
+* Du kannst im Test die Actions deines Stores aufrufen, um die Daten im Store zu ändern
+* Damit kannst Du das korrekte Verhalten deines Stores überprüfen
+* Um Daten außerhalb der Actions zu ändern, kannst Du die `setState`-Funktion verwenden, die
+  auf jedem Store definiert ist
+* Damit kannst du Änderungen noch isolierter testen (z.B. ob eine Komponente neu gerendert wird, unabhängig davon, auf welchem Weg die Daten verändert werden)
+* Der `setState`-Funktion übergibst Du eine Untermenge des States.
+* Die übergebenen Daten werden mit dem bestehenden State zusammengeführt (analog zur `set`-Funktion in einer Action)
+* ```typescript
+  act(() =>
+    useNotificationStore.setState({
+      lang: "de",
+    }),
+  );
+  ```
+* Mit `getState` kannst Du dir jederzeit den aktuellen State abfragen
+* Mit `getInitialState` bekommst Du jederzeit den initialen State
+* ```typescript
+  const currentState = useNotificationState.getState();
+  const initialState = useNotificationState.getInitialState();
+  ```
+* Diese Funktionen stehen dir natürlich auch außerhalb von Tests zur Verfügung.
+---
+### Testen deiner Hooks
+* Den `useXyzStore`-Hook bzw. deine Custom Hooks kannst Du wie gewohnt testen
+* Auch hier gilt: der Store ist global und du musst ihn nach dem testen zurücksetzen
+* ```typescript
+  test("01 useMessage test", async () => {
+    const { result } = renderHook(() => useNotificationMessage());
+
+    expect(result.current).toBeNull();
+
+    act(() =>
+      useNotificationStore.setState({
+        messageId: "not_found",
+      }),
+    );
+
+    // useNotificationMessage liefert die übersetzte Message zurück...
+    expect(result.current).toBe("Not found");
+
+    // Sprache ändern...
+    act(() =>
+      useNotificationStore.setState({
+        lang: "de",
+      }),
+    );
+
+    expect(result.current).toBe("Nicht gefunden");
+
+  });
+
+  ```
   </textarea
           >
         </section>

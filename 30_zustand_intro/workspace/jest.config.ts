@@ -17,6 +17,7 @@ const config: JestConfigWithTsJest = {
     "^.+\\.tsx?$": [
       "ts-jest",
       {
+        allowImportingTsExtensions: true,
         useESM: true,
         diagnostics: { ignoreCodes: ["TS151001"] },
       },
