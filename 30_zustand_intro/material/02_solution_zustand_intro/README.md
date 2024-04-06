@@ -1,0 +1,4 @@
+- Hier ist der "NotificationContext" mit Zustand implementiert
+- In einem echten Projekt würde NotificationContext.tsx auch entsprechend NotificationStore.tsx o.ä. heißen
+  - Ich habe hier den Dateinamen nicht geändert, damit Du die einzelnen Stände leicht(er) vergleichen kannst
+  - 

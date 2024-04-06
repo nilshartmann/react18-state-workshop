@@ -22,6 +22,28 @@ const messages: Record<Lang, Messages> = {
   en: messages_en,
 };
 
+// ================================================================================================================
+//
+//   TODO: Stelle die Context-basierte App auf 'Zustand' um.
+//         - Statt des React Contexts wollen wir jetzt Zustand verwenden
+//           - Den Code vom Context kannst Du auskommentieren oder löschen, ich habe ihn hier
+//             nur drin gelassen, damit Du weißt, was Du umstellen musst :-)
+//         - Die Fachlichkeit soll identisch bleiben
+//         - brauchen wir das `message`-Property in unserem Zustand-Store?
+//         - Kannst Du in deiner Komponente die Selektoren so schreiben, dass wir
+//           weniger Renderzyklen als beim Kontext haben (bzw. das weniger Komponenten neu gerendert werden,
+//           wenn sich eine der Informationen im Store ändert)?
+//           - zur Anzeige der Renderings in `Container.tsx` zwei Werte setzen:
+//             - showRenderings = true
+//             - hideBorder = false
+//             - - - > Das ist eine sehr hemdsärmelige Art, die Renderings anzuzeigen. Im "echten Leben"
+//               besser den Profiler von React verwenden!
+//         - (wofür) würdest Du in der Zustand-Variante der Anwendung Custom Hooks schreiben?
+//
+// ================================================================================================================
+
+// Sieht die Struktur des Zustand-Stores genauso aus wie der Context? 🤔
+
 // entspricht weitgehend im INotificationContext,
 //  nur message fehlt hier; dafür verwenden wir einen Selektor
 type INotificationStore = {
@@ -44,6 +66,8 @@ export const useNotificationStore = create<INotificationStore>()((set) => ({
   },
 }));
 
+// Machen Custom Hooks mit Zustand Sinn?
+// Falls ja: welche? Falls nein: warum nicht?
 export function useNotificationMessage(): string | null {
   const messageId = useNotificationStore((state) => state.messageId);
   // 🤔 🤔 🤔 🤔 🤔 🤔 🤔 🤔

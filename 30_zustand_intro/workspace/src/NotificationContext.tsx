@@ -22,14 +22,25 @@ const messages: Record<Lang, Messages> = {
 
 // ================================================================================================================
 //
-//   TODO: Stelle den Context auf 'Zustand' um.
+//   TODO: Stelle die Context-basierte App auf 'Zustand' um.
 //         - Statt des React Contexts wollen wir jetzt Zustand verwenden
+//           - Den Code vom Context kannst Du auskommentieren oder löschen, ich habe ihn hier
+//             nur drin gelassen, damit Du weißt, was Du umstellen musst :-)
 //         - Die Fachlichkeit soll identisch bleiben
-//         - Kannst Du Selektoren implementieren, die das Rendering gegenüber dem Context
-//           optimieren?
+//         - brauchen wir das `message`-Property in unserem Zustand-Store?
+//         - Kannst Du in deiner Komponente die Selektoren so schreiben, dass wir
+//           weniger Renderzyklen als beim Kontext haben (bzw. das weniger Komponenten neu gerendert werden,
+//           wenn sich eine der Informationen im Store ändert)?
+//           - zur Anzeige der Renderings in `Container.tsx` zwei Werte setzen:
+//             - showRenderings = true
+//             - hideBorder = false
+//             - - - > Das ist eine sehr hemdsärmelige Art, die Renderings anzuzeigen. Im "echten Leben"
+//               besser den Profiler von React verwenden!
+//         - (wofür) würdest Du in der Zustand-Variante der Anwendung Custom Hooks schreiben?
 //
 // ================================================================================================================
 
+// Sieht die Struktur des Zustand-Stores genauso aus wie der Context? 🤔
 type INotificationContext = {
   messageId: MessageId | null;
   message: string | null;
@@ -39,7 +50,9 @@ type INotificationContext = {
   setLanguage(lang: Lang): void;
 };
 
+// Das kannst Du alles entfernen, wenn Du den Zustand Store eingefügt hast.
 //
+
 const NotificationContext = createContext<INotificationContext | null>(null);
 
 type NotificationContextProviderProps = {
@@ -48,13 +61,6 @@ type NotificationContextProviderProps = {
 export default function NotificationContextProvider({
   children,
 }: NotificationContextProviderProps) {
-  // Implementiere hier die Context-Logik
-  //  - welche Informationen aus dem NotificationContext benötigst Du hier im State? Wieviele States verwendest Du?
-  //  - Denk' daran, dass man sowohl die Message als auch die Sprache unabhängig voneinander ändern kann
-  //  - Verwende NotificationContext.Provider um das Context-Objekt zu setzen (value-Property)
-  //  - Als Kind-Element von NotificationContext.Provider musst Du das 'children' Property übergeben, das
-  //    an diese (NotificationContextProvider) Komponente übergeben wurde
-
   const [messageId, setMessageId] = useState<MessageId | null>(null);
   const [language, setLanguage] = useState<Lang>("en");
 
@@ -79,9 +85,9 @@ export default function NotificationContextProvider({
   );
 }
 
+// Machen Custom Hooks mit Zustand Sinn?
+// Falls ja: welche? Falls nein: warum nicht?
 export function useNotificationContext(): INotificationContext {
-  // Implementiere diesen Custom Hook
-  //   Dieser soll
   const ctx = useContext(NotificationContext);
 
   invariant(

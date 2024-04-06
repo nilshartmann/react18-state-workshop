@@ -1045,7 +1045,7 @@ render(
 
   ```
 ---
-### Übung: Test für den Notification Context
+## Übung: Test für den Notification Context
 * Schreibe einen Test für den NotificationContext
 * Du kannst selbst entscheiden, was der beste Weg für dich ist bzw. welche(n) Du ausprobieren möchtest.
   1. Test-Komponente schreiben, die den Context verwendet und dann die Ausgaben der Test-Komponente überprüfen
@@ -1300,6 +1300,300 @@ render(
               </li>
             </ol>
           </div>
+        </section>
+
+        <section data-markdown>
+          <textarea data-template>
+## Zustand (Bibliothek)
+
+* Leichtgewichtige Bibliothek für globalen Zustand
+* Sehr vereinfacht ausgedrückt eine Art `useState` aber für globale Daten
+* Verglichen mit Redux etwas einfacher. Sowohl was Verwendung, aber auch was Features angeht
+---
+### Zustand: Stores
+* Die Daten werden in Stores gehalten
+* Ein Store steht **außerhalb** der Komponentenhierarchie
+  * Das ist ähnlich wie z.B. bei Redux
+* Wir können aus allen Komponenten direkt darauf zugreifen und die Daten darin verändern
+* Komponenten, die auf den Store zugreifen, werden neu gerendert, wenn sich die Daten darin ändern...
+  * ...und sie die **geänderten** Daten verwenden
+  * das ist anders als beim Context!
+  * wir haben also feingranularere Updates
+---
+### Zustand: Stores
+* Ein Store ist ein Objekt, das mit der `create`-Funktion angelegt wird
+* An die `create`-Funktion übergibst Du die sog. `initializer`-Funktion.
+* Das ist eine Callback-Funktion, die dafür verantwortlich ist, den initialen State zu erzeugen
+* Bei der Verwendung mit TypeScript musst Du eine "Currying"-Variante von der `create`-Funktion übergeben, damit du die Typ-Definition setzen kannst
+* ```typescript
+
+  type INotificationStore = {
+    msg: string|null;
+    hide(): void;
+    show(msg: string): void
+  }
+
+  // Achtung () nach der Typ-Angabe nicht vergessen!
+  const useStore = create<INotificationStore>()(
+    (set) => ({
+      msg: null,
+
+      hide(messageId) {
+        set({ msg: null });
+      },
+      show(msg) {
+        set({ msg });
+      },
+    })
+  );
+  ```
+* Wie wir den Store in unseren Komponenten verwenden, sehen wir in Kürze...
+---
+### Zustand: Stores
+* Die `initializer`-Callback-Funktion liefert ein Objekt zurück, dass den initialen Zustand des Stores enthält
+* Das Objekt kann sowohl Daten als auch `Actions` (Methoden) enthalten
+* Mit den Methoden können Verwender des Stores die darin verändern
+  * Es ist nicht möglich, ohne eine Action die Daten zu verändern
+  * Actions sind aber nicht dazu da, Daten aus dem Store zu _lesen_
+* Ein Store ohne Actions ist daher möglich, aber sinnlos:
+* ```typescript
+  type INotificationStore = {
+    msg: string|null;
+  }
+
+  const useStore = create<INotificationStore>()(
+    (set) => ({
+      msg: null,
+    })
+  );
+
+  // und nu'? Wir können die msg zwar lesen, aber nicht ändern...
+  ```
+
+---
+### Zustand: Actions
+* Um die Daten zu verändern, werden Actions verwendet
+* Eine Action ist eine Methode in deinem Store, die von Komponenten aufgerufen werden kann und die ihrerseits neue Daten in den Store setzen kann
+* Die Action-Methode kann beliebige Parameter entgegennehmen, so wie es für dich fachlich sinnvoll ist
+* Eine Action-Methode kannst du als `async function` implementieren, wenn Du darin asynchronen Code unterbringen möchtest
+* In einer Action-Methode kannst Du beliebige Logik ausführen
+* Um den Store mit neuen Daten zu versorgen, verwendest Du die `set`-Funktion, die an deine `initializer`-Funktion übergeben wird
+* ```tsx
+  type CounterStore = { count: number; increaseBy(amount: number): void; resetTo(newCount: number): void }
+
+  const counterStore = create<CounterStore>()( set => ({
+    // count initial auf 0 setzen
+    count: 0,
+
+    resetTo(newCount) {
+      set({ count: newCount });
+    },
+
+    increaseBy(amount) {
+      // number erhöhen und in den State setzen
+      set(currentState => ({ number: currentState.count + amount }),
+    }
+  })
+  ```
+---
+### Zustand: set-Funktion
+* Die set-Funktion kannst Du auf zwei Arten verwenden:
+  1. Du übergibst ihr einen neuen (Teil-Zustand)
+  2. Du übergibst ihr eine Callback-Funktion, über die Du Zugriff auf den aktuellen Inhalt des Stores hast
+* In beiden Fällen lieferst du ein neues Objekt zurück. Das neue Objekt wird dann mit dem bestehenden Inhalt deines Stores **gemerged**
+* ```typescript
+  // Beispiel: Mergen von Zustand
+  type EmployeeStore = { name: string; sallary: number; updateSallary(n: number) => void }
+
+  const employeeStore = create<EmployeeStore>()(set => ({
+       name: "Klaus", sallary: 30000,
+       updateSallary(newSallary: number) {
+            // name wird NICHT verändert, nur sallary neu gesetzt
+            set({sallary: newSallary});
+       }
+  });
+  ```
+---
+### Zustand: set-Funktion
+* Mit der Callback-Notation hast Du Zugriff auf die aktuellen Daten deines Stores
+* Das ist z.B. nützlich, wenn Du Daten auf Basis bestehender Werte verändern möchtest
+* Oder zum Beispiel, wenn Du Prüfungen mit den bestehenden Daten durchführen möchtest
+* ```typescript
+  type EmployeeStore = { name: string; sallary: number; updateSallary(n: number) => void }
+
+  const employeeStore = create<EmployeeStore>()(set => ({
+       name: "Klaus", sallary: 30000,
+       updateSallary(newSallary: number) {
+            // sallary nur aktualisieren, wenn das neue Gehalt über dem bisherigen liegt
+            set(currentState => newSallary > currentState.sallary ? ({ sallary: newSallary }) : {});
+       }
+    )
+  });
+  ```
+---
+### Zustand: get-Funktion
+* Um in einer Action auf den aktuellen Store zuzugreifen, gibt es noch eine andere Möglichkeit
+* An die `initializer`-Funktion wird als zweiten Parameter eine `get`-Funktion geliefert.
+* Diese liefert dir ebenfalls den kompletten Store zurück. Darüber kannst Du auch andere Actions ausführen
+* ```typescript
+  type EmployeeStore = {
+            name: string;
+            position: string;
+            sallary: number;
+            updateSallary(n: number) => void
+            promoteToSenior(): void
+  }
+
+  const employeeStore = create<EmployeeStore>()( (set, get) => ({
+       name: "Klaus", position: "junior", sallary: 30000,
+
+       updateSallary(newSallary: number) {
+            // sallary nur aktualisieren, wenn das neue Gehalt über dem bisherigen liegt
+            const currentSallary = get().sallary;
+
+            if (newSallary > currentSallary) {
+              set({sallary: newSallary });
+            }
+       },
+       promotoToSenior() {
+            // Neue Position setzen
+            set({ position: "senior" });
+
+            // ggf. Gehalt erhöhen
+            get().updateSallary(600000);
+       }
+    )
+  });
+  ```
+---
+### Arbeiten mit dem Store
+* Die `create`-Funktion liefert eine (Hook-)Funktion zurück, die Du in einer Komponente verwenden kannst, um mit dem Store zu kommunizieren
+* Der Hook-Funktion übergibst Du eine Callback-Funktion, die `selector` heißt, weil Du damit die Teile aus dem Store auswählst, die deine Komponente benötigt
+  * Damit kannst Du zwar auch den ganzen Store auswählen, du solltest aber wirklich immer nur das auswählen, was Du auch brauchst
+  * (Ähnlich wie in einer Datenbank, in der Du nur die Spalten einer Tabelle wählst, die du für deine Aufgabe benötigst)
+* ```typescript
+  function SallaryWidget() {
+    const sallary = useEmployeeStore( s => s.sallary );
+    return <div>Your current sallary: {sallary}</div>
+  }
+  ```
+* In diesem Fall wird die Komponente nur neu gerendert, wenn sich das `sallary` ändert.
+  * Wenn sich z.B. die `position` ändern würde, wird die Komponente nicht neu gerendert
+---
+### Arbeiten mit dem Store: Change Detection
+* Um zu ermitteln, ob eine Komponente nach Änderungen an einem Store neugerendet werden muss, vergleicht Zustand **die Rückgabewerte der Selektor-Funktion**
+* Das passiert auf **Referenz-Ebene**.
+  * Deswegen musst Du sehr vorsichtig sein, was du zurücklieferst
+  * Im Zweifel einfach mehrfach die Hook-Funktion aufrufen und die Daten einzeln auswählen
+* Beispiele:
+* ```typescript
+  // Komponente wird immer neugerendert, wenn sich das Sallary im Store ändern (sonst nicht)
+  const sallary = useEmployeeStore(s => s.sallary);
+
+  // Komponente nur neu rendern, wenn Sallary geändert wird und über 500000 liegt
+  // bzw. vorher über 500000 lag und jetzt darunter
+  const hasHighSallary = useEmployeeStore( s => s.sallary > 500000 );
+
+  // Komponente wird neu gerendert, wenn sich entwender sallary und/oder exchangeRate geändert haben
+  //  und die Berechnung dadurch einen neuen Wert zurückliefert
+  const sallaryInDollar = useEmployeeStore( s => s.sallary * s.exchangeRate );
+  ```
+
+---
+### Shallow Vergleiche
+* Werte, die Du aus dem Store auswählst werden mit `Object.is` verglichen
+  * Das ist im Wesentlichen ein Vergleich von Referenzen
+* ```typescript
+  const s1 = "a";
+  const s2 = "a";
+  Object.is(s1, s2); // true
+
+  const n1 = 100;
+  const n2 = 100;
+  Object.is(n1, n2); // true
+
+  // Achtung bei Objekten und Array!
+  const person1 = { firstname: "Klaus" };
+  const person2 = { firstname: "Klaus" };
+  Object.is(person1, person2); // false
+  Object.is(person1, person1); // true
+
+  const cities1 = ["Hamburg", "Berlin"];
+  const cities2 = ["Hamburg", "Berlin"];
+  Object.is(cities1, cities2); // false
+  ```
+* Wenn Du **Objekte** oder **Arrays** aus dem Store auswählst, kann das schnell dazu führen, dass
+            deine Komponente zu häufig neugerendert wird:
+* ```typescript
+  // Rendert jedesmal (!) wenn sich irgendetwas (!) im Store verändert,
+  // da jedesmal (!) liefert die Selektor-Funktion ein neues (!) Objekt
+  // zurück (Object.is ist also immer false)
+  const sallaryAndPosition = useEmployeeStore(s => ({ sal: s.sallary, p: s.position )} )
+  ```
+* Dieses Problem kannst Du auch zwei Arten umgehen
+  1. Du kannst [useShallow](https://docs.pmnd.rs/zustand/guides/prevent-rerenders-with-use-shallow) verwenden
+  2. Du kannst mehrere Selektoren definieren
+---
+### Auswählen mit useShallow
+* Mit [useShallow](https://docs.pmnd.rs/zustand/guides/prevent-rerenders-with-use-shallow) führt Zustand einen "shallow"-Vergleich durch
+* Dann wird nicht die Referenz des zurückgegebenen Objektes verglichen sondern, dessen Eigenschaften/Werte auf oberste Ebene im Objekt/Array
+* ```typescript
+  // useShallow führt zu shallowEqual-Vergleich
+  // hier wird s.sallary und s.position jeweils mit Object.is verglichen
+  // Nur wenn einer der Aufrufe false ergibt, wird die Komponente neu gerendert
+  const sallaryAndPosition = useEmployeeStore(useShallow(s => ({ sal: s.sallary, p: s.position )}));
+  ```
+* "Nur auf oberste Ebene" bedeutet, dass bei verschachtelten Objekten/Arrays Änderungen unterhalb *nicht* erkannt werden:
+* ```typescript
+  // Store sieht z.B. so aus:
+  const contactStore = {
+    address: {
+      city: "Hamburg"
+    }
+    email: "klaus@example.de"
+  }
+
+  const address = useContactStore(useShallow(s => ({ address: s.address, email: s.email })));
+  ```
+---
+### Auswählen mit mehreren Selektoren
+* Du kannst das Problem mit Referenzen und `useShallow` umgehen, in dem Du einfach mehrere useStore-Aufrufe verwendest,
+            die jeweils primitive Typen auswählen (bzw. solche Werte, die stabile Referenzen haben, wie actions z.B.)
+* ```typescript
+  // Diese ausgewählten Werte können alle problemlos und zuverlässig mit "Object.is" verglichen werden:
+  const sallary = useEmployeeStore(s => s.sallary);
+  const position = useEmployeeStore(s => s.position);
+  const promoteToSenior = useEmployeeStore(s => s.promoteToSenior);
+  ```            
+---
+### Arbeiten mit dem Store: Actions ausführen
+* Actions wählst du auf dieselbe Art aus, wie Daten. Es gelten die selben Regeln.
+* Dann kannst Du sie wie normale Funktionen in deiner Komponente verwenden
+* ```typescript
+  function PromoteButton() {
+    const isSenior = useEmployeeStore( s => s.position === 'senior' );
+    const promoteToSenior = useEmployeeStore( s => s.promoteToSenior );
+
+    return <button disabled={isSenior} onClick={ () => promoteToSenior() }>
+            Promote me to senior!
+            </button>
+  }
+  ```
+---
+## Übung: Zustand Basics
+* *Stelle den `NotificationContext` auf Zustand um*
+  * Doku: https://docs.pmnd.rs/zustand/getting-started/introduction
+* Bitte arbeite im Verzeichnis `30_zustand_intro/workspace`
+  * Dort `npm install` und `npm start` ausführen (alten npm-Prozess ggf. beenden)
+* Der Stand dort entspricht dem "fertigen" Stand aus dem Context-Teil mit fertigem `NotificationContext`
+* Stelle `NotificationContext` auf einen Zustand-Store um (Verhalten soll gleich bleiben) und verwende den Store dann in `NotificationApp`
+*   TODOs findest Du in `NotificationContext.tsx` und `NotificationApp.tsx`
+* Eine Lösung findest Du in `material/02_solution_zustand_intro`
+* Bei Fragen: fragen 😊
+* Wenn Du fertig bist, bitte die Hand heben ✋
+
+  </textarea
+          >
         </section>
 
         <section>

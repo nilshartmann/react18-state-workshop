@@ -1,7 +1,7 @@
 import NotificationApp from "../NotificationApp.tsx";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useNotificationStore } from "../NotificationStore.tsx";
+import { useNotificationStore } from "../NotificationContext.tsx";
 test("01 initial", async () => {
   render(<NotificationApp />);
 

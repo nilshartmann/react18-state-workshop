@@ -6,6 +6,7 @@ import {
 import { useShallow } from "zustand/react/shallow";
 
 export default function NotificationApp() {
+  // todo: Den NotificationContextProvider entfernen (ersatzlos streichen)
   return (
     <Container title={"App"}>
       <div className={"SameSizeFlex"}>
@@ -18,8 +19,8 @@ export default function NotificationApp() {
 }
 
 function NotificationBar() {
-  // TODO: Lies die aktuelle Nachricht aus dem NotificationContext uns zeige sie unten an
-  const message = useNotificationMessage();
+  // TODO: Lies die aktuelle Nachricht aus dem Store uns zeige sie unten an
+  const { message } = useNotificationContext();
 
   return (
     <Container title={"NotificationBar"}>
@@ -30,8 +31,14 @@ function NotificationBar() {
 
 function NotificationTrigger() {
   // TODO: Implementiere 'onClick'-Handler für die Button, so dass
-  //       die Button die im Label beschriebenen Aktionen im Context
-  //       durchführen
+  //       die Buttons jeweils die entsprechende Action im Zustand Store ausführen
+  //       - Achtung! Diese Komponente sollte sich nur ändern, wenn sich eine der Actions
+  //         ändert. (Also faktisch nie, denn die Actions ändern sich ja nicht...)
+  //         - Die Komponente soll sich NICHT neu rendern, wenn eine Message oder Sprache gesetzt
+  //           oder geändert wird
+  //         - was musst Du dafür machen bzw. beachten?
+  //       - Die Anzahl der Renderings zeigt die Container-Komponente an
+  //           (ggf. showRenderings = true setzen in Container.tsx)
 
   // 🤔🤔🤔🤔🤔
   //  - was passiert, wenn wir auf das 'useShallow' verzichten?
@@ -71,10 +78,14 @@ function NotificationTrigger() {
 
 function NotificationStatus() {
   // TODO:
-  //   - Prüfe ob zzt. eine Nachricht im Context gesetzt ist
-  //     und zeige dann an, dass eine Nachricht gesetzt ist, bzw. das keine
-  //     Nachricht gesetzt ist.
-  //     Also nur die Info ob Nachricht (nicht) gesetzt ist, aber nicht die eigentliche Nachricht
+  //   Überprüfe hier, ob eine Message im Zustand-Store vorliegt und zeige diese Information an
+  //   Die Komponente sollte sich nur dann neu Rendern, wenn sich diese Information ändert
+  //   D.h:
+  //    - wenn eine Message gesetzt ist und diese sich ändert oder die Sprache sich ändert => nicht neu rendern
+  //    - wenn eine Message gesetzt war und nun nicht mehr => neu rendern, damit die Status-Anzeige aktualisiert wird
+  //    - wenn keine Message gesetzt war und nun eine ist => neu rendern, damit die Status-Anzeige aktualisiert wird
+  //  Die Anzahl der Renderings zeigt die Container-Komponente an
+  //   (ggf. showRenderings = true setzen in Container.tsx)
   const hasNotification = useNotificationStore(
     (state) => state.messageId !== null,
   );
