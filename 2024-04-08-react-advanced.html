@@ -2277,7 +2277,319 @@ function changeName(userId, newName) {
     * Plötzlich hat eine weitere Komponente (`ShoppingCartItem`) eine Abhängigkeit auf den Store, das macht die Tests möglicherweise komplexer
 * Zielgerichtet nur dort optimieren, wo wirklich notwendig
   * Bin mir ziemlich sicher, dass in unserem Beispiel die gezeigten Optimierungen überflüssig sind 😜
+---
+### Zustand: Komplexe Stores
+* Grundsätzlich könnt ihr in Zustand mehrere Stores anlegen und verwenden
+* Damit könnt ihr die Daten und Logik fachlich trennen
+  * zum Beispiel `ShoppingCartStore` und `UserProfileStore`
+* Die Stores sind dann komplett unabhängig von einander
+* Aber es gibt natürlich auch Logik, die sich nicht so einfach trennen lässt:
+  * Vielleicht haben wir einen Store mit Produkt-Informationen
+  * und die ShoppingCart
+  * Die Anwendung braucht oft beide Stores (z.B. um den Produktnamen zu einer Produkt-Id zu ermitteln oder den Gesamtpreis im Warenkorb anzuzeigen)
+* Fachlich wäre es hier sowohl sinnvoll, die Stores zu trennen... aber genauso sinnvoll, **einen** Store daraus zu machen
+* Für solche Fälle eignen sich **Slices**
+---
+### Zustand: Slices
+* Ein Slices ist eine Art "Unter-State" oder "Teil-State", der mehr oder minder fachlich abgeschlossen ist
+  * Der Begriff kommt ursprünglich aus [Redux](https://redux-toolkit.js.org/usage/usage-guide#creating-slices-of-state)
+* Mehrere Slices werden dann zu **einem** Store zusammengeführt
+* ...aber in der Entwicklung können die Slices getrennt entwickelt werden
+* Aus Sicht des **Verwenders** ist das **ein** Store
+  * das es mehrere Slices sind, ist dann eher ein Implementierungsdetail
 
+---
+### Erzeugen eines Slices
+* Ein Slice wird ähnlich erzeugt wie ein Store
+  * Du schreibst zunächst eine Funktion, die den initialien State des Slices erzeugt und zurückliefert
+  * diese Funktion wird `StateCreator` genannt
+* Dessen Ergebnis gibst Du zunächst aber **nicht** an die `create`-Funktion von Zustand
+* ```typescript
+  const shoppingCartSlice = (get) => ({
+   items: [],
+   addItem(productIt) { /* ... */ }
+   // ...
+  })
+  ```
+---
+### Erzeugen eines Slices: TypeScript
+* Die Typsicherheit bzw. die Typ-Angabe ist "etwas" komplex in diesem Fall.
+* Es gibt einen Typen `StateCreator`, den Du verwenden kannst. Dieser erwartet gleich vier Typ-Argumente:
+  1. Der erste Typ beschreibt den **kompletten** Store mit allen Slices
+  2. Der zweite und dritte Typ beschreibt "Modifier"-Funktionen, wie etwa die `immer` Middleware
+  3. Der vierte Typ gibt an, wie der State aussieht, mit dem Du in diesem Slice arbeitest
+    * Kann identisch mit dem ersten Typen sein, aber auch eine Untermenge dessen
+* ```typescript
+  type ProductSlice = { products: IProduct[] }
+  type ShoppingCartSlice = { items: IShoppingCartItem[], username: string }
+
+  const createProductSlice: StateCreator<
+    ProductSlice & ShoppingCartSlice,
+    [["zustand/immer", never], never],
+    [],
+    ProductSlice> =
+      (set, get) => ({ /* wie bekannt */ })
+  ```
+* Ich bin nicht sicher, ob es hier viel Flexibilität gibt, wenn man immer benutzt
+* Trotz des einschränkenden vierten Typ-Arguments (`ProductSlice`) haben set- und get
+            Zugriff auf den kompletten Store (mit `ShoppingCartSlice`)
+* Zur Laufzeit hat man sowieso den ganzen Store
+---
+### Slices: Den "Bounded Store" erstellen
+* Ein "Bounded Store" ist ein Store, der aus mehreren Slices besteht
+* Erzeugt wird er mit der bekannten "Curry"-Variante der `create`-Funktion von immer.
+* Als Typ-Argument wird hier ein TypeScript-Typ verwendet, der den gesamten Store inkl. aller Slices beschreibt.
+* Die `intializer`-Funktion wird hier verwendet, um die einzelnen Slices zu intialisieren:
+* ```typescript
+  export const useAppStore = create<ProductSlice & ShoppingCartSlice>()(
+    immer((...a) => ({
+      ...createProductSlice(...a),
+      ...createShoppingCardSlice(...a),
+    })),
+  );
+  ```
+* Was passiert hier? 🙀 ... 🙀 ... 🙀
+---
+### Slices: Den "Bounded Store" erstellen
+* So würden wir zwei separate Stores erzeugen (ohne Slice):
+* ```typescript
+  function shoppingCartInitializer(set, get) {
+    return {
+      items: [],
+      addItem(id) { set( /* ... */ ) }
+    }
+  }
+  function productInitializer(set, get) {
+    return {
+      products: [],
+      addProduct(id) { set( /* ... */ ) }
+    }
+  }
+
+  const useShoppingCartStore = create(
+    immer(shoppingCartInitializer)
+  );
+  const useShoppingCartStore = create(
+    immer(productInitializer)
+  )
+  ```
+---
+### Slices: Den "Bounded Store" erstellen
+* Um daraus **einen** Store zu machen (Lang-Version):
+* ```typescript
+  // initializer unverändert
+  function shoppingCartInitializer(set, get) { /* ... */ }
+  function productInitializer(set, get) { /* ... */ }
+
+  const useAppStore = create( immer ((get, set) => {
+
+    const productSlice = productInitializer(get, set);
+    const shoppingCartSlice = shoppingCartInitializer(get, set);
+
+    return {
+      products: productSlice.products,
+      addProduct: productSlice.addProduct,
+      items: shoppingCartSlice.items
+      addItem: shoppingCartSlice.addItem
+    }
+  })
+  ```
+* Das Beispiel etwas kürzer:
+  *  egal welche Argumente von 'create' unserer Funktion übergeben werden,
+  *  wir reichen sie an `immer` und unsere Initializer 1:1 weiter
+* ```typescript
+  const useAppStore = create( immer ((...a) => {
+    const productSlice = productInitializer(...a);
+    const shoppingCartSlice = shoppingCartInitializer(...a);
+    return { /* ... wie oben ... */ };
+  })
+  ```
+---
+### Slices: Den "Bounded Store" erstellen
+* ...und in noch kürzer
+  * wir verwenden den Spread-Operator, um die Ergebnisse der initializer-Funktionen in das State-Objekt zu "spreaden":
+* ```typescript
+  const useAppStore = create( immer ((...a) => {
+    const productSlice = productInitializer(...a);
+    const shoppingCartSlice = shoppingCartInitializer(...a);
+
+    return {
+       ...productSlice
+       ...shoppingCartSlice
+    };
+  })
+  ```
+* ...noch kürzer ist dann nur noch die zuerst gesehene Variante
+* ```typescript
+  export const useAppStore = create(
+    immer((...a) => ({
+      ...createProductSlice(...a),
+      ...createShoppingCardSlice(...a),
+    })),
+  );
+  ```
+* und mit TypeScript geben wir noch den Typ des Gesamtstores an und verwenden die "Curry"-Funktion:
+* ```typescript
+  export const useAppStore = create<ProductSlice & ShoppingCartSlice>()(
+    immer((...a) => ({
+      ...createProductSlice(...a),
+      ...createShoppingCardSlice(...a),
+    })),
+  );
+  ```
+---
+### Übung: ein Bounded Store mit zwei Slices
+* Wir arbeiten in `50_zustand_advanced/workspace`
+* Kopiere bitte den kompletten Inhalt von `50_zustand_advanced/material/15_slices/00_initial`
+  in das `src`-Verzeichnis: `50_zustand_advanced/workspace/src`
+  * bestehende Dateien ggf. überschreiben
+* In `50_zustand_advanced/workspace` ggf. `npm install` und dann `npm start` ausführen
+  * Noch laufende npm-Prozesse vorher abbrechen
+* Aufgaben:
+  1. Stelle `useShoppingCartStore` in `shopingCartSlice.ts` auf einen Slice bzw. `StateCreator` um
+  2. Erzeuge den "Bounded Store" in `appStore.ts`
+  3. Vervollständige in `ShoppingCartApp.tsx` die `ProductList` und `Product`-Komponenten
+* Du findest in allen Dateien auch entsprechende TODOs
+* Bei Fragen und Problemen melde dich jederzeit
+* Eine mögliche Lösung findest Du in `50_zustand_advanced/material/15_slices/10_solution`
+* Wenn Du fertig bist, bitte in Zoom die Hand heben ✋
+---
+### "Globale" Actions
+* Bislang sind unsere Slices unabhängig voneinander
+* Allerdings gibt es im `ProductSlice` die Methode `removeProduct`
+* Diese soll ein Produkt entfernen
+* 🤔 Was tun wir wenn das Produkt auch im `ShoppingCartSlice` schon in einem `ShoppingCartItem` referenziert wird? 🤔
+* 🤔 Welche Möglichkeiten seht ihr, um das entsprechende Item dann auch dem `ShoppingCartSlice` zu entfernen? 🤔
+* Wir können Ideen auf dem Miro-Board sammeln
+---
+### Eine Möglichkeit...
+* Wir rufen einfach `removeProduct` auf und danach machen wir noch einen Call um auch den `ShoppingCartSlice` zu aktualisieren
+* ```typescript
+  export function ProductItem( { productId } ) {
+    const removeProductFromStore = useAppStore((s) => s.removeProduct);
+    const updateItemQuantity = useAppStore((s) => s.updateItemQuantity);
+
+    // Wird beim Klick auf "Dieses Produkt löschen" aufgerufen:
+    const handleRemoveProduct = () => {
+        removeProductFromStore(productId);
+        updateItemQuantity(productId, -100000000); // 🙀 🫣 'removeFromCart'-Action wäre im Store toll...
+      }
+
+    return /* ... */
+  }
+  ```
+* Was gefällt euch daran (nicht)?
+* ```typescript
+---
+### Eine etwas andere Möglichkeit...
+* Wir rufen einfach `removeProduct` auf und danach machen wir noch einen Call um auch den `ShoppingCartSlice` zu aktualisieren
+* ...dieses mal aber in einem Custom Hook:
+* ```typescript
+  export function useRemoveProduct() {
+    const removeProductFromStore = useAppStore((s) => s.removeProduct);
+    const updateItemQuantity = useAppStore((s) => s.updateItemQuantity);
+
+    // Wird beim Klick auf "Dieses Produkt löschen" aufgerufen:
+    const removeProduct =
+      (productId: string) => {
+        removeProductFromStore(productId);
+        updateItemQuantity(productId, -100000000); // 🙀 🫣 'removeFromCart'-Action wäre im Store toll...
+      }
+
+    return removeProduct
+  }
+
+  function ProductItem( {productId} ) {
+    const removeProduct = useRemoveProduct();
+
+    return <div>
+            { /* ... */ }
+            <button onClick={ () => removeProduct(productId) }>Remove</button>
+    </div>
+  ```
+* Ist das besser? Schlechter? Perfekt? Saublöd?
+---
+### Eine zweite Möglichkeit: eine Action im appStore
+* Wir können den `appStore` erweitern...
+* Der `appStore` hat Zugriff auf beide Slices und kann die Aufgabe übernehmen für uns
+* Das können wir direkt im `appStore` machen oder wir legen einen `appSlice` an,
+            der übergreifende Actions enthält
+*
+* ```typescript
+  type AppSlice = {
+    removeProductFromStore(productId: string): void;
+  };
+  const createAppSlice: StateCreator</*...*/> = (set, get) => {
+    return {
+      removeProductFromStore(productId: string) {
+        get().removeProduct(productId);
+        get().updateItemQuantity(productId, -100000000); // 🙀 🫣 'removeFromCart'-Action wäre im Store toll...
+      },
+    };
+  };
+  ```
+* Der `appStore` erhält dann einfach nur einen dritten Slice:
+* ```typescript
+  export const useAppStore = create<ProductSlice & ShoppingCartSlice & AppSlice>()
+  (
+    immer((...a) => ({
+      ...createProductSlice(...a),
+      ...createShoppingCardSlice(...a),
+      ...createAppSlice(...a),
+    })),
+  );
+  ```
+---
+### Eine zweite Möglichkeit: eine Action im appStore
+* Konsequenzen
+  * Für die Anwendung bleibt weiterhin der Store der "Ansprechpartner" (und nicht ein Custom Hook)
+  * Der App Store ist die zentrale Stelle, an der unsere Logik implementiert wird
+  * Das Update ist nun in jedem Fall atomar
+* 🤔 Ist die Lösung so gut? Was gefällt euch besser? 🤔
+---
+### Eine dritte Möglichkeit: die Slices kennen sich!
+* Jeder Slice hat immer auch Zugriff auf alle anderen Slices zur Laufzeit
+* So kann der `ProductSlice` z.B. in der `removeProduct`-Action eine Action im `ShoppingCartSlice` aufrufen:
+* ```typescript
+  export const createProductSlice = {
+    // alles wie bekannt
+  > = (set, get) => ({
+    removeProduct(productId: string) {
+      // 1. Produkt aus diesem Slice entfernen (wie bekannt):
+      set((state) => {
+        const ix = state.products.findIndex((p) => p.id === productId);
+        state.products.splice(ix, 1);
+      });
+
+      // 2. ShoppingCartSlice aktualisieren
+      get().updateItemQuantity(productId, -100000000); // 🙀 🫣 'removeFromCart'-Action wäre im Store toll...
+    }
+    // ...
+  });
+  ```
+* 🤔 Wie ist diese Option? 🤔
+---
+### Globale Actions: Fazit
+* Es gibt eine Reihe von Möglichkeiten
+* Zustand macht keine Aussage darüber, wie wir solche Actions implementieren müssen oder sollen ("unopionated")
+* Ich denke, man muss im konkreten Fall schauen
+  * Dabei würde ich darauf achten, dass man nicht zu viele Abhängigkeiten zwischen den Slices hat (wie im letzten Beispiel)
+  * wenn man das hat (oft ruft Slice A eine Action in Slice B auf und/oder umgekehrt), vielleicht darüber nachdenken, daraus **einen** Slice zu machen
+---
+### Struktur des Stores
+* Können wir die Slices noch anders strukturieren?
+* Wie wäre es mit "Namespaces"?
+* 🤔 Habt ihr eine Idee? 🤔
+* <!-- .element: class="demo" --> Beispiel in `40_namespaces`
+
+---
+### Übung: Eine globale Action
+* *Baue eine Action, die ein Produkt aus `ProductSlice` und auch ggf. aus `ShoppingCartSlice` entfernt
+* Wähle bei der Implementierung den Weg, der dir für diesen Anwendungsfall am besten gefällt
+* Arbeite in `50_zustand_advanced/workspace` und verwende den bestehenden Store und die bestehenden Slices
+  * Du darfst natürlich alles umbauen, so dass es dir gut gefällt
+* Bei Fragen und Problemen melde dich gerne.
+* Die besprochenen Ansätze findest Du fertig implementiert in `50_zustand_advanced/material/20_updates`
 
   </textarea
           >

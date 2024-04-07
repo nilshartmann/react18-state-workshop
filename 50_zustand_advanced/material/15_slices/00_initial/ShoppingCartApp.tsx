@@ -1,6 +1,6 @@
 import Container from "./Container.tsx";
 import { IProduct } from "./shopping-cart.types.ts";
-import {useShoppingCartStore} from "../10_cartStore/10_solution/stores/shoppingCartSlice";
+import { useShoppingCartStore } from "../10_cartStore/10_solution/stores/shoppingCartSlice";
 
 export default function ShoppingCartApp() {
   return (
@@ -57,34 +57,26 @@ function ShoppingCart() {
   return (
     <Container title={"ShoppingCart"}>
       <h3>My Shopping Cart</h3>
-      {/*
-
-      TODO:
-      - zeige eine Liste aller Items aus der ShoppingCart an
-      - ein einzelnes Item soll mit der Komponente "ShoppingCartItem" angezeigt werden
-      - überlege dir, welche Informationen du wo aus dem Store ausliest und wie die API (Properties)
-          der ShoppingCartItem-Komponente aussieht
-
-      */}
 
       {productIds.map((pId) => (
         <ShoppingCartItem key={pId} productId={pId} />
       ))}
     </Container>
   );
-
 }
 
 type ShoppingCartItemProps = {
-  productId: string
+  productId: string;
 };
 
-function ShoppingCartItem({productId}: ShoppingCartItemProps) {
+function ShoppingCartItem({ productId }: ShoppingCartItemProps) {
   const item = useShoppingCartStore((state) =>
     state.items.find((i) => i.productId === productId),
   );
 
-  const updateItemQuantity = useShoppingCartStore((state) => state.updateItemQuantity);
+  const updateItemQuantity = useShoppingCartStore(
+    (state) => state.updateItemQuantity,
+  );
 
   const handleIncrease = (amount: number) => {
     updateItemQuantity(productId, amount);
@@ -94,13 +86,9 @@ function ShoppingCartItem({productId}: ShoppingCartItemProps) {
     return <h1>Item not found</h1>;
   }
 
-
-
   return (
     <Container title={`Item ${item.productId}`}>
-      <p>
-        Product-Id: ({item.productId})
-      </p>
+      <p>Product-Id: ({item.productId})</p>
       <p>Quantity: {item.quantity}</p>
       <button onClick={() => handleIncrease(-1)}>Decrease</button>
       <button onClick={() => handleIncrease(+1)}>Increase</button>
