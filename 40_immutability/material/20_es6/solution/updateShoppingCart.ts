@@ -34,7 +34,15 @@
 //
 //
 
-import { IShoppingCart } from "./shopping-cart.types.ts";
+type IShoppingCartItem = {
+  productId: string;
+  quantity: number;
+};
+
+type IShoppingCart = {
+  username: string;
+  items: IShoppingCartItem[];
+};
 
 export function updateShoppingCart(
   cart: IShoppingCart,

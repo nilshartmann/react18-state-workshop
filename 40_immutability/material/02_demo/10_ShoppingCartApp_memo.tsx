@@ -1,5 +1,5 @@
 import Container from "./Container.tsx";
-import { useState } from "react";
+import { memo, useState } from "react";
 
 type IShoppingCartItem = {
   productId: string;
@@ -25,14 +25,27 @@ export default function ShoppingCartApp() {
   const [myShoppingCart, setMyShoppingCart] = useState(createCart);
 
   const handleIncreaseClick = (pId: string) => {
-    const itemIx = myShoppingCart.items.findIndex(
-      (item) => item.productId === pId,
-    );
+    const copyItem = (item: IShoppingCartItem): IShoppingCartItem => {
+      if (pId !== item.productId) {
+        // No need to copy
+        return item;
+      }
 
-    // todo: myShoppingCart aktualisieren:
-    //   - In dem Item mit itemId (bzw. identifiziert durch pId) soll 'quantity' um 1 erhöht werden
+      return {
+        productId: item.productId,
+        quantity: item.quantity + 1,
+      };
+    };
 
-    console.log("New Shopping Cart", myShoppingCart);
+    const newShoppingCart = {
+      username: myShoppingCart.username,
+      items: [
+        copyItem(myShoppingCart.items[0]),
+        copyItem(myShoppingCart.items[1]),
+      ],
+    };
+
+    setMyShoppingCart(newShoppingCart);
   };
 
   return (
@@ -60,11 +73,13 @@ type ShoppingCartItemProps = {
   item: IShoppingCartItem;
 };
 
-function ShoppingCartItem({ item }: ShoppingCartItemProps) {
+const ShoppingCartItem = memo(function ShoppingCartItem({
+  item,
+}: ShoppingCartItemProps) {
   return (
     <Container title={`Item ${item.productId}`}>
       <p>Product: {item.productId}</p>
       <p>Quantity: {item.quantity}</p>
     </Container>
   );
-}
+});

@@ -34,9 +34,21 @@
 //      - wenn die Cart nicht verändert wird => Cart unverändert zurückgeben!
 //      - Items die in der Cart nicht verändert werden => unverändert zurückgeben
 //
+//  KONTROLLE / TEST
+//   - Wenn Du alles korrekt implementiert hast, sollten die Tests in '__test__/updateShoppingCart.test.ts'
+//       alle "grün" werden
+//
 //
 
-import { IShoppingCart } from "./shopping-cart.types.ts";
+type IShoppingCartItem = {
+  productId: string;
+  quantity: number;
+};
+
+type IShoppingCart = {
+  username: string;
+  items: IShoppingCartItem[];
+};
 
 export function updateShoppingCart(
   cart: IShoppingCart,

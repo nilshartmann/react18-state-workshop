@@ -25,9 +25,21 @@
 //       - wenn die neue Quantity < 1 ist, soll das Produkt aus der Cart entfernt werden
 //       - ansonsten soll die Quantity im bestehenden Produkt aktualisiert werden
 //
+//  KONTROLLE / TEST
+//   - Wenn Du alles korrekt implementiert hast, sollten die Tests in '__test__/updateShoppingCartImmter.test.ts'
+//       alle "grün" werden
 
-import { IShoppingCart } from "./shopping-cart.types.ts";
 import { produce } from "immer";
+
+type IShoppingCartItem = {
+  productId: string;
+  quantity: number;
+};
+
+type IShoppingCart = {
+  username: string;
+  items: IShoppingCartItem[];
+};
 
 export function updateShoppingCartImmer(
   cart: IShoppingCart,

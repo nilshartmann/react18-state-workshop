@@ -34,8 +34,17 @@
 //
 //
 
-import { IShoppingCart } from "./shopping-cart.types.ts";
 import { produce } from "immer";
+
+type IShoppingCartItem = {
+  productId: string;
+  quantity: number;
+};
+
+type IShoppingCart = {
+  username: string;
+  items: IShoppingCartItem[];
+};
 
 export function updateShoppingCartImmer(
   cart: IShoppingCart,

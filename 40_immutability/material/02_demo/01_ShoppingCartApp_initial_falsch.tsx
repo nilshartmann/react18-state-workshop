@@ -29,8 +29,11 @@ export default function ShoppingCartApp() {
       (item) => item.productId === pId,
     );
 
-    // todo: myShoppingCart aktualisieren:
-    //   - In dem Item mit itemId (bzw. identifiziert durch pId) soll 'quantity' um 1 erhöht werden
+    // 👮‍ SO NICHT ! 🚷
+
+    myShoppingCart.items[itemIx].quantity =
+      myShoppingCart.items[itemIx].quantity + 1;
+    setMyShoppingCart(myShoppingCart);
 
     console.log("New Shopping Cart", myShoppingCart);
   };
