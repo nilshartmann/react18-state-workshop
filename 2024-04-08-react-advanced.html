@@ -2123,12 +2123,162 @@ function changeName(userId, newName) {
 * In der vorherigen Übung haben wir `updateShoppingCart` nur mit JavaScript gebaut.
 * Baue nun dieselbe Funktion, aber mit nun mit Immer.
 * Du kannst entweder deine bisherige Funktion einfach anpassen,
-  * oder Du startest in `updateShoppingCartImmer.ts`
+  * oder Du startest in `40_immutability/workspace/src/updateShoppingCartImmer.ts`
 * Auch hier gibt es Tests zur Kontrolle: `src/__test__/updateShoppingCartImmer.test.ts`
   * Da die Fachlichkeit der beiden Implementierung identisch sein soll, sind auch die Tests identisch
 * Bei Problemen und Fragen, melde dich.
 * Eine Lösung findest Du in `40_immutability/material/25_immer/solution`
 * Wenn Du fertig bist, bitte Hand heben ✋
+  </textarea
+          >
+        </section>
+        <section data-markdown="">
+          <textarea data-template>
+## Zustand, Teil 2
+---
+### Zustand Middlewares
+* Middlewares erlauben euch, euren Store um (technische) Features zu erweitern
+* Fertige Middlewares gibt es für:
+  * das Ablegen der Store-Daten in einen Client-seitigen Storage (z.B. Local Storage): https://docs.pmnd.rs/zustand/integrations/persisting-store-data
+  * und die Integration von Immer: https://docs.pmnd.rs/zustand/integrations/immer-middleware
+* Middlewares sind eine Funktion, die ihr um eure Initializer-Funktion legt
+* ```typescript
+  import { create } from "zustand";
+  import { immer } from "zustand/middleware/immer";
+
+  const useShoppingCartStore = create<ShoppingCartStore>()(
+    immer((set, get) => ({
+      // ... unverändert ...
+    )}
+  );
+  ```
+* Wenn ihr die Immer Middleware verwendet, bekommt ihr in der Setter-Funktion im Store den aktuellen State als Immer **Draft**
+* ```typescript
+  const useShoppingCartStore = create<ShoppingCartStore>()(
+    immer((set, get) => ({
+      items: [],
+      updateShoppingCart(id, quantity) {
+        set(stateDraft => stateDraft.items.find(i => i.id === id).quantity = quantity;
+      }
+    )}
+  );  
+  ```
+---
+### Übung: Immer Middleware in Zustand
+* Wir arbeiten im Verzeichnis `50_zustand_advanced/workspace`
+* Dort bitte ggf. `npm install` und dann `npm start` ausführen
+  * (Laufende npm-Prozesse am besten vorher beenden)
+* In der Datei `src/stores/shoppingCartSlice` musst Du einen Store für die `ShoppingCart` implementieren
+  * Verwende dabei die `immer`-Middleware. Für die Update-Logik kannst Du deine `updateShoppingCartImmer`-Funktion in leicht modifizierter Variante verwenden.
+* In `ShoppingCartApp` musst Du deinen Store dann verwenden (s.h. TODOs dort)
+* Bei Fragen oder Problemen melde dich.
+* Eine mögliche Lösung findest Du in `50_zustand_advanced/material/10_cartStore/10_solution`
+* Wenn Du fertig bist, bitte Hand heben in Zoom ✋
+---
+### Feingranulare Updates
+* Wir haben bereits einige Techniken gesehen, mit dem Du (unnötige) Renderings unterbinden kannst
+* Du kannst auch bei der Auswahl von Daten aus dem Store die Renderings beeinflussen
+* Was wird hier wann gerendert? 🤔
+* ```typescript
+  function ShoppingCart() {
+    const items = useShoppingCartStore(s => s.items);
+    return items.map(i => <ShoppingCartItem key={i.id} item={i} />)
+  }
+
+  function ShoppingCartItem( {item} ) {
+    // render ShoppingCartItem
+  }
+  ```
+---
+### Feingranulare Updates
+* Wenn sich die `items`-Liste im Store ändert (aus welchem Grund auch immer, wird die `ShoppingCart` neu gerendert
+  * und auch alle `ShoppingCartItem`-Komponenten
+* Das Können wir mit einer `memo`-Komponente verbessern
+* Du kannst an `React.memo` eine Komponente übergeben. `memo` liefert dann eine "memoisierte" (also gecachte) Komponente zurück
+* Diese wird nur neu gerendert, wenn sich mind. ein Property geändert hat (verglichen mit `Object.is`)
+* Da unsere `IShoppingCartItem`s immutable sind, würden dann nur die `ShoppingCartItem`-Komponenten neu gerendert, deren Daten sich auch geändert haben
+* ```typescript
+  const ShoppingCartItem = React.memo(function ShoppingCartItem( {item} ) {
+    // render ShoppingCartItem
+  })
+  ```
+* Können wir noch weiter optimieren?
+---
+### Feingranulare Updates #2
+* Nochmal ein Blick auf die `ShoppingCart`-Komponente 👀
+* ```typescript
+  function ShoppingCart() {
+    const items = useShoppingCartStore(s => s.items);
+    return items.map(i => <ShoppingCartItem key={i.id} item={i} />)
+  }
+  ```
+* Können wir das noch weiter optimieren? 🤔
+---
+### Feingranulare Updates #2
+* Die `ShoppingCart` wird bei jeder kleinsten Änderung an **einem** Item neu gerendert.
+* Eigentlich würde es ausreichen, die `ShoppingCart` neu zu rendern, wenn sich die **Liste** geändert hat
+  * Z.B. die Reihenfolge in der Liste
+  * oder wenn Items hinzugekommen oder entfernt worden sind
+* Wie könnten wir das umsetzen? 🤔
+---
+### Feingranulare Updates #2
+* Bei der Arbeit mit vielen globalen State Management System ist es üblich, dass die Komponenten weitgehend die Daten auswählen,
+            die sie selbst benötigen
+  * Aber nicht die Daten für ihre Kind-Elemente
+  * Denn das können die Daten des globalen Charakters des State Managements ja selbst tun
+* In `ShoppingCart` wählen wir nur noch die **Ids** der darzustellenden Items:
+* ```typescript
+  function ShoppingCart() {
+    const itemIds = useShoppingCartStore(useShallow(s => s.items.map(i => i.id) ) );
+    return itemIds.map(id => <ShoppingCartItem key={id} itemId={id} />)
+  }
+  ```
+* Das eigentliche Item wählen wir jetzt in ShoppingCartItem
+* ```typescript
+  const ShoppingCartItem = memo(function ShoppingCartItem( { itemId } ) {
+    const item = useShoppingCartStore(s => s.items.find(i => i.id === itemId) );
+
+    // Item rendern
+  })
+  ```
+---
+### Feingranulare Updates #2
+* Erinnerung: wir können das noch feingranularer machen
+* Wenn `ShoppingCartItem` nicht **alle** Informationen des Items nutzt, wählen wir nur die aus, die wir brauchen
+  * Dann werden `ShoppingCart` und vorallem `ShoppingCartItem` tatsächlich nur gerendert, wenn wirklich notwendig
+* ```typescript
+  const ShoppingCartItem = memo(function ShoppingCartItem( { itemId } ) {
+    // nur name und price wählen
+    // wenn sich quantity des Items ändern würde, wird nicht neu gerendert
+    const name = useShoppingCartStore(s => s.items.find(i => i.id === itemId).name );
+    const price = useShoppingCartStore(s => s.items.find(i => i.id === itemId).price );
+
+    // Alternativ (an useShallow denken!):
+    const nameAndPrice = useShoppingCartStore(useShallow(s => {
+            const item = s.items.find(i => i.id === itemId);
+            return { name: item.name, price: item.price }
+    }));
+
+    // name und price rendern
+  })
+  ```
+
+---
+### Render Optimierungen
+* Ob und wann solche und andere Optimierungen notwendig sind, hängt von deiner Anwendung und deinen Anforderungen ab
+* Wenn man auf stabile Referenzen (Immutability!) achtet, kann man gut zielgerichtet Optimierungen dort vornehmen, wo sie notwendig sind
+* Es macht in der Regel wenig Sinn, von vornerein Optimierungen vorzunehmen
+  * Oft stellen auch viele Renderings kein Performance-Problem dar
+  * Die gezeigten Änderungen haben ja auch Konsequenzen
+    * man muss (etwas) mehr Code schreiben
+    * `useShallow` und `memo` haben auch Auswirkungen auf Performance und Speicher (Caches sind nicht "umsonst", was Resourcen angeht)
+    * Im letzten Beispiel: ist zweimal `find` schneller als `useShallow`? Oder sogar ohne Optimierung?
+      * Wie schnell vergessen wir `useShallow` zu verwenden?
+    * Plötzlich hat eine weitere Komponente (`ShoppingCartItem`) eine Abhängigkeit auf den Store, das macht die Tests möglicherweise komplexer
+* Zielgerichtet nur dort optimieren, wo wirklich notwendig
+  * Bin mir ziemlich sicher, dass in unserem Beispiel die gezeigten Optimierungen überflüssig sind 😜
+
+
   </textarea
           >
         </section>

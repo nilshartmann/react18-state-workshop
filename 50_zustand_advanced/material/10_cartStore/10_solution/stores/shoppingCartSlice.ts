@@ -43,7 +43,7 @@ export const useShoppingCartStore = create<ShoppingCartStore>()(
       get().updateItemQuantity(productId, 1);
     },
     updateItemQuantity(productId: string, amount: number) {
-      // draft is now  WritableDraft thanks to immer middleware
+      // draft is now  WritableDraft<ShoppingCartStore> thanks to immer middleware
       set((draft) => {
         if (amount === 0) {
           return;

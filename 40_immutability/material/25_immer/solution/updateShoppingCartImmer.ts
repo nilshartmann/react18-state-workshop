@@ -74,13 +74,6 @@ export function updateShoppingCartImmer(
     // item is present
     const newQuantity = existingItem.quantity + amount;
     if (newQuantity < 1) {
-      // Here we COULD work with items.filter as without immer,
-      //  but we also can work with splice, which would not possible
-      //  WITHOUT immer
-      //   - use what best fits for you
-      //   - eventhough I think 'filter' would be better here,
-      //     I'm using splice to demonstrate that
-      //     you COULD use splice here
       const ix = draft.items.findIndex((p) => p.productId === productId);
       draft.items.splice(ix, 1);
       return;
