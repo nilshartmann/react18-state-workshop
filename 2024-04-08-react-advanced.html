@@ -124,21 +124,53 @@
         </section>
 
         <!-- ============================================================================= -->
+        <section>
+          <h2>Grundsätzliches</h2>
+          <p class="fragment">Bitte schaltet Euer Video ein 🙏</p>
+          <p class="fragment">
+            <b>Jederzeit:</b> Fragen und Diskussionen! Bringt euch gerne ein.
+          </p>
+          <p class="fragment">Motto: Es gibt keine dummen Fragen!</p>
+          <p class="fragment">
+            Bemerkbar machen per Audio, "Hand heben" oder Chat
+          </p>
+          <p class="fragment">
+            <img width="50%" src="slides/images/zoom-reaktionen.png" />
+          </p>
+
+          <p class="fragment">
+            Ich zeige viel direkt im Editor, aber ihr könnt die Slides als
+            Referenz benutzen
+          </p>
+          <p class="fragment">
+            Wir machen zwischendurch Übungen, in denen ihr selbst programmieren
+            könnt
+          </p>
+        </section>
         <section data-markdown>
           <textarea data-template>
+### Zeitplan
+* Montag und Dienstag, 8. und 9. April
+* Montag, 15. April
+* jeweils 09.00 Uhr bis ca. 16.00 Uhr
+  * 12.00 bis 13.00 Uhr Mittagspause 🍝
+  * Kurze Pausen zwischendurch ☕️
+---
 ## Agenda
 <!-- .slide: class="no-fragment xleft" -->
-**_"Modernes Data- und Statemanagement"_**
-
-* **Montag**
-  * [Context API](#/t-context)
-    * Neuerungen in [React 19](#/t-react19) 
-    * Renderzyklen optimieren mit [useCallback, useMemo](#/t-context-render)
-  * [TanStack Query](#/t-tanstack-query)
-    * "Modernes" React: Data Fetching mit Suspense
-
-* **Dienstag**
-  * Code Review, mögliche Refaktorings, ...
+**_"Vertiefung in React"_**
+* [Context API](#/t-context)
+* [Testen mit Jest (Einführung)](#/t-test-jest)
+* [Testen von React Komponenten und Hooks](#/t-testen-react)
+* [Error Boundaries](#/t-error-boundaries)
+* [Die Bibliothek "Zustand" für globalen Zustand (Basics: Stores, Actions, Change Detection)](#/t-zustand)
+  * [Testen von Anwendungen mit Zustand](#/t-zustand-test)
+* [Renderverhalten von React und Immutable Data](#/t-immutability)
+* [Immutability mit Immer](#/t-immer)
+* [Zustand Bibliothek: Middleware und Slices](#/t-zustand-2)
+* **„State of the Art“-Themen und künftige Features**
+  * [Arbeiten mit Suspense für asynchrone und serverseitige Daten](#/t-async-data)
+  * [Fullstack-Anwendungen am Beispiel Next.js]
 
           </textarea>
         </section>
@@ -513,6 +545,9 @@ function UserBadge() {
 
           </textarea>
         </section>
+        <section id="t-test-jest">
+          <h1>Testen</h1>
+        </section>
         <section data-transition="slide none">
           <h2>Was testen wir?</h2>
           <ul>
@@ -694,8 +729,8 @@ expect(aMockFn.mock.calls[0][1]).toBe("world");
           </p>
         </section>
 
-        <section>
-          <h3>Testen von React Komponenten</h3>
+        <section id="t-testen-react">
+          <h3>Testen von React Komponenten und Hooks</h3>
         </section>
 
         <section>
@@ -1060,6 +1095,7 @@ render(
         <section data-markdown>
           <textarea data-template>
 ## Error Boundaries
+<!-- .slide: id="t-error-boundaries" -->
 * 🤔Was passiert, wenn wir in unserer App vergessen, den `NotificationContextProvider` einzubinden? 🤔
 * <!-- .element: class="demo" -->Ausprobieren (NotificationApp.tsx)
 ---
@@ -1305,7 +1341,7 @@ render(
         <section data-markdown>
           <textarea data-template>
 ## Zustand (Bibliothek)
-
+<!-- .slide: id="t-zustand" -->
 * Leichtgewichtige Bibliothek für globalen Zustand
 * Sehr vereinfacht ausgedrückt eine Art `useState` aber für globale Daten
 * Verglichen mit Redux etwas einfacher. Sowohl was Verwendung, aber auch was Features angeht
@@ -1617,6 +1653,9 @@ render(
   * Man könnte einen Custom Hook bauen, der alle **Actions** eines Stores liefert? Warum? 🤔
 ---
 ### Testen von Zustand-Stores
+<!-- .slide: id="t-zustand-test" -->
+---
+### Testen von Zustand-Stores
 * Du kannst deine Anwendung wie gewohnt mit Jest/Vitest und Testing Library testen
 * Du kannst entweder Komponenten testen, die den Store benutzen oder die Store-Hook-Funktionen oder deine Custom Hook-Funktionen
 * ⚠️ Beim Test musst du bedenken: **der Store ist global** und wird **nicht zurückgesetzt *zwischen* einzelnen Tests**!
@@ -1730,6 +1769,7 @@ render(
         </section>
         <section data-markdown>
           <textarea data-template>
+<!-- .slide: id="t-immutability" -->
 ## Arbeiten mit unveränderlichen (immutable) Datenstrukturen
           </textarea>
         </section>
@@ -2003,7 +2043,8 @@ const olderPersons = persons.map( p => {
 
         <section data-markdown>
           <textarea data-template>
-## Immutability mit ImmerJs
+<!-- .slide: id="t-immer" -->
+## Immutability mit Immer
 * Für einfache Operationen stehen eine Reihe guter JavaScript Bordmittel zur Entwicklung von immutable Code zur Verfügung
 * Aber bei komplexen Änderungen ist die Arbeit mit nativen JavaScript Mitteln sehr aufwendig und fehleranfällig
 * Dafür gibt es eine populäre Bibliothek: ImmerJs!
@@ -2135,6 +2176,7 @@ function changeName(userId, newName) {
         <section data-markdown="">
           <textarea data-template>
 ## Zustand, Teil 2
+<!-- .slide: id="t-zustand-2" -->
 ---
 ### Zustand Middlewares
 * Middlewares erlauben euch, euren Store um (technische) Features zu erweitern
@@ -2590,6 +2632,9 @@ function changeName(userId, newName) {
   * Du darfst natürlich alles umbauen, so dass es dir gut gefällt
 * Bei Fragen und Problemen melde dich gerne.
 * Die besprochenen Ansätze findest Du fertig implementiert in `50_zustand_advanced/material/20_updates`
+--
+## Arbeiten mit asynchronen und serverseitigen Daten
+<!-- .slide: id="t-async-data" -->
 
   </textarea
           >
