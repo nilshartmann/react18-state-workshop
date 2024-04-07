@@ -38,10 +38,10 @@ Damit wir sicher sind, dass während des Workshops alles funktioniert, möchte i
 
 ## Schritt 1: Backend
 
-* Bitte im Verzeichnis `backend` einmal das REST Backend installieren und starten
+* Bitte im Verzeichnis `60_tanstack_query/backend` einmal das REST Backend installieren und starten
 * Das Backend läuft auf Port 7000, d.h. dieser Port muss verfügbar sein!
 * ```bash
-  # Im Verzeichnis backend
+  # Im Verzeichnis 60_tanstack_query/backend
   
   npm install
   npm start
@@ -52,10 +52,10 @@ Damit wir sicher sind, dass während des Workshops alles funktioniert, möchte i
 
 ## Schritt 2: Frontend
 
-* Während der Schulung werden wir mehrere unterschiedliche Frontend-Stände und -Workspaces verwenden. Diese haben aber alle dasselbe Setup (gleiches Vite, gleiche npm-Packages etc.), deswegen exemplarisch bitte einmal `60_tanstack_query/45_suspense_preload` installieren und starten
+* Während der Schulung werden wir mehrere unterschiedliche Frontend-Stände und -Workspaces verwenden. Diese haben aber alle dasselbe Setup (gleiches Vite, gleiche npm-Packages etc.), deswegen exemplarisch bitte einmal `60_tanstack_query/workspace` installieren und starten
 * Das Backend muss parallel laufen (s.o.)
 * ```bash
-  # Im Verzeichnis 60_tanstack_query/45_suspense_preload
+  # Im Verzeichnis 60_tanstack_query/workspace
   
   npm install
   npm start
@@ -63,14 +63,6 @@ Damit wir sicher sind, dass während des Workshops alles funktioniert, möchte i
 * Das Frontend läuft auf Port 3000. 
 * Bitte einmal http://localhost:3000 im Browser öffnen, dort sollte die Seite "React Training Blog" mit einer Liste von Blog Posts erscheinen
 * Wenn das geklappt hat, ist alles gut!
-
-## Schritt 3 (optional): Tests ausführen
-* Es gibt zwei Jest Tests, diese könnt ihr probehalber einmal ausführen:
-* ```bash
-  # Im Verzeichnis 60_tanstack_query/45_suspense_preload
-  
-  npm test
-  ```
 
 **Das ist alles 😊**
 
