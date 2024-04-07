@@ -55,8 +55,9 @@
             <p>
               <span class="transparent-bg"
                 >Remote:
-                <a href="https://github.com/nilshartmann/react18-training"
-                  >https://github.com/nilshartmann/react18-training</a
+                <a
+                  href="https://github.com/nilshartmann//react18-state-workshop"
+                  >https://github.com/nilshartmann/react18-state-workshop</a
                 ></span
               >
             </p>
@@ -73,8 +74,8 @@
               <span class="transparent-bg"
                 >Remote:
                 <a
-                  href="https://nilshartmann.github.io/react18-training/2024-04-08-react-advanced.html"
-                  >https://nilshartmann.github.io/react18-training/2024-04-08-react-advanced.html</a
+                  href="https://nilshartmann.github.io/react18-state-workshop/2024-04-08-react-advanced.html"
+                  >https://nilshartmann.github.io/react18-state-workshop/2024-04-08-react-advanced.html</a
                 ></span
               >
             </p>
@@ -170,7 +171,8 @@
 * [Zustand Bibliothek: Middleware und Slices](#/t-zustand-2)
 * **„State of the Art“-Themen und künftige Features**
   * [Arbeiten mit Suspense für asynchrone und serverseitige Daten](#/t-async-data)
-  * [Fullstack-Anwendungen am Beispiel Next.js]
+  * [Suspense](#/t-suspense)
+  * Ausblick: Fullstack-Anwendungen am Beispiel Next.js
 
           </textarea>
         </section>
@@ -2632,7 +2634,7 @@ function changeName(userId, newName) {
   * Du darfst natürlich alles umbauen, so dass es dir gut gefällt
 * Bei Fragen und Problemen melde dich gerne.
 * Die besprochenen Ansätze findest Du fertig implementiert in `50_zustand_advanced/material/20_updates`
---
+---
 ## Arbeiten mit asynchronen und serverseitigen Daten
 <!-- .slide: id="t-async-data" -->
 
@@ -2640,265 +2642,11 @@ function changeName(userId, newName) {
           >
         </section>
 
-        <section>
-          <h3>Testen von fetch-Aufrufen</h3>
-          <p>Herausforderungen:</p>
-          <ul>
-            <li>Asynchroner Code (nicht beschränkt auf fetch)</li>
-            <li>Server Zugriffe/Server Mocks</li>
-          </ul>
-        </section>
-        <section>
-          <h3>Behandlung von asynchronem code</h3>
-        </section>
-
-        <section>
-          <h3>Testen von asynchronem Code</h3>
-          <p>
-            Beispiel: Die <b>App</b> Komponente lädt Daten,
-            <em>erst dann</em> stellt sie die PostList dar. Das Laden der Posts
-            ist asynchron.
-          </p>
-
-          <pre><code class="javascript">
-            it("should render posts read from backend", () => {
-              render(&lt;App />);
-
-              // Annahme: es gibt einen Artikel mit dem Title "Learning React"
-              const articleOne = screen.findByRole("heading", { name: "Learning React" });
-
-              expect(articleOne).toBeInTheDocument(); // THIS WON'T WORK!
-            });
-          </code></pre>
-          <p>
-            Wir können einen Test als async-funktion schreiben und darin mit
-            <b>await</b> auf ein Element warten
-          </p>
-          <pre><code class="javascript">
-            // Test-Funktion als async-Funktion (beachte 'async'):
-            it("should render posts read from backend", async () => {
-              render(&lt;App />);
-
-              // Beachte await hier:
-              const articleOne = await screen.findByRole("heading", { name: "Learning React" });
-
-              expect(articleOne).toBeInTheDocument(); // YIPPIE, WORKS
-            });
-          </code></pre>
-          <p>
-            Achtung! Ihr müsst <code>find</code> Query-Funktionen verwenden, da
-            die <code>get</code>-Funktionen davon ausgehen, dass ein Element
-            bereits vorhanden ist, und nicht noch darauf warten.
-          </p>
-        </section>
-
-        <!-- ============================================================================= -->
-        <section>
-          <h3>Testen von fetch</h3>
-          <p>Wie gesehen, können wir asynchronen Code testen</p>
-          <p>Wollen wir fetch-Aufrufe in unserem Code haben, den wir testen?</p>
-          <p>
-            Möglicherweise nicht, weil wir bei echten fetch-Aufrufen auch einen
-            echten, laufenden und funktionierenden Server im Test bräuchten
-          </p>
-          <p>Stattdessen wollen wir das "echte" fetch mocken</p>
-        </section>
-
-        <section>
-          <h3>Fetch mocken, Ansatz #1</h3>
-          <p>Wir können <b>komplette Module</b> in Jest mocken</p>
-          <p>
-            Wir könnten unseren fetch-Code in ein eigenes Modul schieben und das
-            dann mocken
-          </p>
-
-          <pre><code class="javascript">
-            // api.ts (fetch vereinfacht!)
-            export function readPosts() {
-              return fetch("http://localhost:7000/posts").then(response => response.json());
-            }
-          </code></pre>
-
-          <pre><code class="javascript">
-            // App.tsx:
-
-            import { readPosts } from "./api";
-            function App() {
-              // ...
-              React.useEffect(() => {
-                // Verwenden von readPosts hier:
-                readPosts()
-                  .then(json => {
-                    setLoading(false);
-                    setPosts(json);
-                  })
-                  .catch(err => console.error("Loading data failed: " + err));
-              }, []);
-            }
-          </code></pre>
-        </section>
-        <section>
-          <h3>Mocken von Modulen in Jest</h3>
-          <p>Es gibt mehrere Varianten. Das hier die einfachste(?)</p>
-
-          <pre><code class="javascript">
-            // App.test.tsx
-
-            const mockPosts = [
-              { id: "1", title: "One Fetch Mock", body: "Lorem ipsum" },
-              { id: "2", title: "Second Post Fetch Mock", body: "Some more content" }
-            ];
-
-            jest.mock("../api", () => ({
-              readPosts: () => Promise.resolve(mockPosts)
-            }));
-
-            it("should render posts read from backend", async () => {
-              render(&lt;App />);
-
-              // Hier immer noch asnychroner Code (deswegen await), aber:
-              // kein laufender Server mehr benötigt
-              const articleOne = await screen.findByRole("heading", { name: "One" });
-              expect(articleOne).toBeInTheDocument();
-
-              expect(screen.getByText("Second Post")).toBeInTheDocument();
-            });
-          </code></pre>
-          <p>
-            Beispiel:
-            <code
-              >blog-example/steps/6a-testing-with-api-module/src/__tests__/App_module_mock.test.tsx</code
-            >
-          </p>
-        </section>
-        <section>
-          <h3>Ansatz #2: fetch API mocken</h3>
-          <p>Es gibt mehrere Bibliothken mit fetch-Mocks</p>
-          <p>
-            Für mich funktioniert
-            <a
-              href="https://www.npmjs.com/package/jest-fetch-mock"
-              target="_blank"
-              >jest-fetch-mock</a
-            >
-            am Besten
-          </p>
-
-          <pre><code class="javascript">
-            // App.test.tsx
-            it("should render posts read from backend", async () => {
-              // setzen des Ergebnisses, das der nächste fetch-Aufruf zurückliefern soll
-              fetchMock.mockResponse(JSON.stringify(mockPosts));
-
-              render(&lt;App />);
-
-              // Immer noch asynchroner Code, aber kein "echter" fetch-Aufruf mehr,
-              // zurückgegeben wird das oben angegebene Ergebnis
-              const articleOne = await screen.findByRole("heading", { name: "One Fetch Mock" });
-
-              expect(articleOne).toBeInTheDocument();
-            });
-
-          </code></pre>
-          <p>
-            Beispiel:
-            <code
-              >blog-example/steps/6a-testing-with-api-module/src/__tests__/App_jest_mock.test.tsx</code
-            >
-          </p>
-        </section>
-
-        <section data-markdown>
-          <textarea data-template>
-### jest-fetch-mock
-
-* `fetchMock.mockResponse`: Ersetzt *alle* Aufrufe mit dem übergebenen Ergebnis
-* `fetchMock.mockResponseOnce`: Ersetzt nur den nächsten Aufruf mit dem übergebenen Ergebnis
-* `fetchMock.mockResponses`: Ersetzt die nächsten X Aufrufe mit den übergebenen Ergebnissen
-* Alle Funktionen haben dieselbe Signatur:
-  * Entweder ihr setzt direkt das Ergebnis, das zurückgeliefert werden soll
-  * Oder ihr gebt eine Callback-Funktion an, die ein `Promise` mit der gewünschten Ergebnis zurückliefert
-* Wenn ihr das Ergebnis direkt setzt, könnt ihr zwei Parameter übergeben:
-  1. Den Body, der zurückgeliefert werden soll Achtung! String kein Objekt! (ggf.`JSON.stringify()` verwenden)
-  2. Ein Objekt mit init-Parametern, mit dem ihr z.B. den Status setzen könnt
-  * siehe dazu [API Dokumentation der Response Funktion](https://developer.mozilla.org/en-US/docs/Web/API/Response/Response)
-* ```
-  const mockPosts = [ { title: "Hello", body: "World"} ];
-  // liefert HTTP 200 OK zurück für alle folgenden fetch-Aufrufe zurück:
-  fetchMock.mockResponse(JSON.stringify(mockPosts));
-  ```
-* ```
-const mockResponse = { id: "100", title: "Hello", body: "World", createdAt: "2022-09-06"};
-// liefert HTTP 201 CREATED für den nächsten fetch-Aufrufe zurück:
-fetchMock.mockResponse(JSON.stringify(mockResponse), { status: 201 });
-```
-
-
-          </textarea>
-        </section>
-
-        <!-- ============================================================================= -->
-        <section>
-          <h3>Ansatz #3: Mock Service Worker (MSW)</h3>
-
-          <p><a href="https://github.com/mswjs/msw" target="_blank">MSW</a></p>
-          <p>
-            MSW mockt echte Server-Aufrufe mit einem
-            <a
-              href="https://developer.mozilla.org/de/docs/Web/API/Service_Worker_API"
-              >Service Worker</a
-            >
-          </p>
-          <p>
-            fetch-Aufrufe werden "richtig" ausgeführt, aber beantwortet von dem
-            Service Worker Mock
-          </p>
-
-          <pre><code class="javascript">
-            // PostList.test.js
-            import { rest } from 'msw'
-            import { setupServer } from 'msw/node'
-
-            const server = setupServer(
-              rest.get('/posts', (req, res, ctx) => {
-                return res(ctx.json( mockPosts ))
-              }),
-            )
-
-            test("it should render blog list", async () => {
-              render(&lt;PostList />);
-              // ...
-            })
-          </code></pre>
-        </section>
-        <section data-markdown>
-          <textarea data-template>
-# Immutable DAten
-* In React funktioniert viel (Change Detection) über immutable Daten
-* Welche Möglichkeiten gibt es in JavaScript?
-* Wie hilft `immer`?
-<!-- .element: class="todo" -->aus anderen Schulungen übernehmen
-# Globales Zustandsmanagement
-
-* Übersicht was gibt es?
-* Woran interscheiden sich die Tools
-  * REdux auch Logik, alle anderen "eher" nur State
-* Zustand
-
-  </textarea
-          >
-        </section>
-
         <!-- ============================================================================= -->
 
         <section data-markdown>
           <textarea data-template>
-# Suspense
-<!-- .element: class="todo" -->"State of the Art": Suspense (am Beispiel TanStack Query)
-<!-- .element: class="todo" -->TS Query Teil entschlacken, Fokus auf Suspense, evtl. mit Transitions (das wäre dann auch concurrent mode)
-<!-- .element: class="todo" -->error boundaries (Teil 1: was sind EBs -> Fehler beim Rendern (!!!), Teil 2: mit Suspense)
-
----            
+---
 <!-- .slide: id="t-tanstack-query" -->            
 # Mordernes Data Fetching in React
 ---
@@ -3032,25 +2780,15 @@ automatisch aus dem Cache aktualisiert
 ---
 ## Übung: Daten lesen mit TanStack Query
 
-* **Vorbereitung**
-* Workspace in der IDE öffnen: `react18-training/advanced/workspace`
-* Schritt 1: Backend starten
+* Vorbereitung: Backend starten
   * ```bash
-  cd react18-training/blog-example/backend-rest
+  cd 60_tanstack_query/backend
+  npm install # falls noch nicht gemacht
   npm start
   ```
-  * Danach sollte unter [http://localhost:7000/posts](http://localhost:7000/posts) 
-die Liste mit den (JSON-)Posts zurückkommen
-* Schritt 2: Frontend (Vite) starten
-  * ```bash
-  cd react18-training/advanced/workspace
-  npm start
-  ```
-  * Die Anwendung sollte auf [http://localhost:3000](http://localhost:3000) laufen
-  * Die Anwendung benutzt noch `useEffect` und `fetch`... das wollen wir ändern!
----
-### Übung: Daten lesen mit TanStack Query
-
+  * Danach sollte unter [http://localhost:7000/posts](http://localhost:7000/posts)
+* Wir arbeiten in `60_tanstack_query/workspace`
+* Dort ggf. `npm install` und dann `npm start` ausführen (vorherige npm-Prozesse bitte beenden)
 * In der Komponente `PostListPage` wird `fetch` bzw. `useEffect` zum Laden der Daten verwendet
 * Stelle diese Komponente auf `useQuery` um.
 * Zeige eine Warte-Meldung an, während die Daten geladen werden
@@ -3058,8 +2796,226 @@ die Liste mit den (JSON-)Posts zurückkommen
 * TanStack Doku: 
   * [Queries](https://tanstack.com/query/v5/docs/framework/react/guides/queries)
   * [useQuery](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery)
-* Mögliche Lösung: `steps/10_useQuery`
+* Mögliche Lösung: `60_tanstack_query/material/10_useQuery`
+* Wenn Du fertig bist, bitte die Hand heben ✋
+---
+### Exkurs: Testen von fetch-Aufrufen und asynchronem Code
 
+Herausforderungen:
+
+- Asynchroner Code (nicht beschränkt auf fetch)
+- Server Zugriffe/Server Mocks
+
+---
+
+### Behandlung von asynchronem code
+
+---
+
+### Testen von asynchronem Code
+
+Beispiel: Die **PostListPage**-Komponente lädt Daten, *erst dann* zeigt sie die DAten ann. Das Laden der Posts ist asynchron.
+
+```javascript
+it("should render posts read from backend", () => {
+  render(<PostListPage />);
+
+  // Annahme: es gibt einen Artikel mit dem Title "Learning React"
+  const articleOne = screen.findByRole("heading", { name: "Learning React" });
+
+  expect(articleOne).toBeInTheDocument(); // THIS WON'T WORK!
+});
+```
+
+Wir können einen Test als asynchrone Funktion schreiben und darin mit **await** auf ein Element warten
+
+```javascript
+// Test-Funktion als async-Funktion (beachte 'async'):
+it("should render posts read from backend", async () => {
+  render(<PostListPage />);
+
+  // Beachte await hier:
+  const articleOne = await screen.findByRole("heading", { name: "Learning React" });
+
+  expect(articleOne).toBeInTheDocument(); // YIPPIE, WORKS
+});
+```
+
+Achtung! Ihr müsst `find` Query-Funktionen verwenden, da die `get`-Funktionen davon ausgehen, dass ein Element bereits vorhanden ist, und nicht noch darauf warten.
+
+---
+
+### Testen von fetch
+
+Wie gesehen, können wir asynchronen Code testen
+
+Wollen wir "echte" `fetch`-Aufrufe in unserem Code haben, den wir testen?
+
+Möglicherweise nicht, weil wir bei echten fetch-Aufrufen auch einen echten, laufenden und funktionierenden Server im Test bräuchten
+
+Stattdessen wollen wir das "echte" fetch mocken
+
+---
+
+### Fetch mocken, Ansatz #1
+
+Wir können **komplette Module** in Jest mocken
+
+Wir könnten unseren fetch-Code in ein eigenes Modul schieben und das dann mocken
+
+```javascript
+// api.ts (fetch vereinfacht!)
+export function readPosts() {
+  return fetch("http://localhost:7000/posts").then(response => response.json());
+}
+```
+
+```javascript
+// App.tsx:
+
+import { readPosts } from "./api";
+function App() {
+  // ...
+  React.useEffect(() => {
+    // Verwenden von readPosts hier:
+    readPosts()
+      .then(json => {
+        setLoading(false);
+        setPosts(json);
+      })
+      .catch(err => console.error("Loading data failed: " + err));
+  }, []);
+}
+```
+
+---
+
+### Mocken von Modulen in Jest
+
+Es gibt mehrere Varianten. Das hier die einfachste(?)
+
+```javascript
+// App.test.tsx
+
+const mockPosts = [
+  { id: "1", title: "One Fetch Mock", body: "Lorem ipsum" },
+  { id: "2", title: "Second Post Fetch Mock", body: "Some more content" }
+];
+
+jest.mock("../api", () => ({
+  readPosts: () => Promise.resolve(mockPosts)
+}));
+
+it("should render posts read from backend", async () => {
+  render(<App />);
+
+  // Hier immer noch asnychroner Code (deswegen await), aber:
+  // kein laufender Server mehr benötigt
+  const articleOne = await screen.findByRole("heading", { name: "One" });
+  expect(articleOne).toBeInTheDocument();
+
+  expect(screen.getByText("Second Post")).toBeInTheDocument();
+});
+```
+
+---
+
+### Ansatz #2: fetch API mocken
+
+Es gibt mehrere Bibliothken mit fetch-Mocks
+
+Für mich funktioniert [jest-fetch-mock](https://www.npmjs.com/package/jest-fetch-mock) am Besten
+
+```javascript
+// App.test.tsx
+it("should render posts read from backend", async () => {
+  // setzen des Ergebnisses, das der nächste fetch-Aufruf zurückliefern soll
+  fetchMock.mockResponse(JSON.stringify(mockPosts));
+
+  render(<App />);
+
+  // Immer noch asynchroner Code, aber kein "echter" fetch-Aufruf mehr,
+  // zurückgegeben wird das oben angegebene Ergebnis
+  const articleOne = await screen.findByRole("heading", { name: "One Fetch Mock" });
+
+  expect(articleOne).toBeInTheDocument();
+});
+```
+
+---
+### jest-fetch-mock
+
+* `fetchMock.mockResponse`: Ersetzt *alle* Aufrufe mit dem übergebenen Ergebnis
+* `fetchMock.mockResponseOnce`: Ersetzt nur den nächsten Aufruf mit dem übergebenen Ergebnis
+* `fetchMock.mockResponses`: Ersetzt die nächsten X Aufrufe mit den übergebenen Ergebnissen
+* Alle Funktionen haben dieselbe Signatur:
+  * Entweder ihr setzt direkt das Ergebnis, das zurückgeliefert werden soll
+  * Oder ihr gebt eine Callback-Funktion an, die ein `Promise` mit der gewünschten Ergebnis zurückliefert
+* Wenn ihr das Ergebnis direkt setzt, könnt ihr zwei Parameter übergeben:
+  1. Den Body, der zurückgeliefert werden soll Achtung! String kein Objekt! (ggf.`JSON.stringify()` verwenden)
+  2. Ein Objekt mit init-Parametern, mit dem ihr z.B. den Status setzen könnt
+  * siehe dazu [API Dokumentation der Response Funktion](https://developer.mozilla.org/en-US/docs/Web/API/Response/Response)
+* ```
+  const mockPosts = [ { title: "Hello", body: "World"} ];
+  // liefert HTTP 200 OK zurück für alle folgenden fetch-Aufrufe zurück:
+  fetchMock.mockResponse(JSON.stringify(mockPosts));
+  ```
+* ```
+const mockResponse = { id: "100", title: "Hello", body: "World", createdAt: "2022-09-06"};
+// liefert HTTP 201 CREATED für den nächsten fetch-Aufrufe zurück:
+fetchMock.mockResponse(JSON.stringify(mockResponse), { status: 201 });
+```
+---
+### Alternative: nock
+* [Nock](https://github.com/nock/nock) mockt ebenfalls `fetch`-Aufrufe analog zu jest-fetch-mock
+* Die API zum beschreiben des Mock-Verhaltens ist hier aber sehr viel mächtiger
+* Es gibt aber Probleme mit dem nativen `fetch` in neueren Node.js-Versionen
+  * nock funktioniert damit nur mit einer Beta-Version
+  * In unserem Setup hier habe ich aber auch die Beta-Version nicht ans Laufen bekommen
+* ```typescript
+  // in meiner Testdatei:
+  const nock = require('nock')
+
+  const scope = nock('http://localhost:7000')
+    .get('/posts')
+    .reply(200, mockPosts);
+
+  // Test dann unverändert
+  ```
+---
+### Alternative: Mock Service Worker
+* **Mock Service Worker** ([MSW](https://github.com/mswjs/msw))
+* ...verwendet [Service Worker](https://developer.mozilla.org/de/docs/Web/API/Service_Worker_API), um Netzwerk-Requests zu mocken
+* Dadurch werden `fetch`-Aufrufe noch ausgeführt, aber nicht vom "echten" Netzwerk beantwortet, sondern vom gemockten
+* ```typescript
+  // PostList.test.tsx
+  import { rest } from 'msw'
+  import { setupServer } from 'msw/node'
+
+  const server = setupServer(
+    rest.get('/posts', (req, res, ctx) => {
+      return res(ctx.json( mockPosts ))
+    }),
+  )
+
+  test("it should render blog list", async () => {
+    render(&lt;PostList />);
+
+    // alles weitere wie gesehen...
+  })
+  ```
+* Mock Service Worker bieten die realistischsten Tests, weil am wenigsten Code gemockt wird
+---
+### End-to-End Browser Tests
+* Hier wird die zu testende Anwendung gestartet und dann ein Browser "ferngesteuert"
+* Diese Tests sind oft aufwändig zu schreiben (und vor allem: zu warten) und verglichen mit den anderen Ansätzen langsamer
+* Aber: sie bieten eine hohe Sicherheit, denn wir testen die echte, komplette Anwendung im Browser
+* **Häufig eingesetzt:**
+  * [Selenium](https://www.selenium.dev/): der Klassiker, gibt's schon lange, für alle Programmiersprachen. API ist m.E. umständlich.
+  * [Cypress](https://www.cypress.io/) und [TestCafe](https://testcafe.io/): Leichtgewichtige Alternativen zu Selenium. Funktionieren technisch etwas anders, weniger "low-level". Tests werden entweder aufgezeichnet und/oder in JavaScript bzw. TypeScript geschrieben.
+  * [Playwright](https://playwright.dev/): Browser-Test-Framework von Microsoft für unterschiedliche Sprachen (u.a. TypeScript und Java). Vergleichsweise schnelle Ausführung, guter Support für diverse Browser. Hype-Kurve extrem steil zurzeit.
+  * Sowohl Cypress, TestCafe als auch Playwright bieten gute Features zum Debuggen der Tests und auch gute Reports (samt Videos und Screenshots von der Durchführung des Tests) im Fehlerfalle.
+  * Alle Tools lassen sich in einer CI/CD-Pipeline ausführen.
 ---
 ### TanStack Query: Mutations
 
@@ -3211,7 +3167,7 @@ die Liste mit den (JSON-)Posts zurückkommen
 * Optional: Wenn es einen Fehler gibt, soll eine Fehlermeldung ausgegeben werden
   * Du kannst Fehler beim Speichern provozieren, in dem Du einen Titel eingibst, der kürzer als fünf Zeichen lang ist
 * Optional: Wenn es einen Fehler gab und der Benutzer danach etwas in eines der Textfelder eingibt, soll die Fehlermeldung wieder verschwinden
-* Mögliche Lösung `steps/20_useMutation`
+* Mögliche Lösung `material/20_useMutation`
 ---
 ## Custom Hooks
 * Custom Hooks sind "normale" JavaScript/TypeScript-Funktionen, die aber andere (React-) Hooks (z.B. `useState`) verwenden können
@@ -3247,7 +3203,7 @@ die Liste mit den (JSON-)Posts zurückkommen
   * Den `fetch`-Code für die `queryFn` kannst Du aus `PostPage` übernehmen
 * Stelle dann `PostPage` um, so dass diese Komponente deinen Hook verwendet
 * Verwende dann deinen Hook um in `Sidebar` das Blog-Post mit Id `P10` zu laden und daraus `title` und `likes` anzuzeigen
-* Lösung: `steps/30_custom_hook` 
+* Lösung: `material/30_custom_hook`
   
 ---
 ## Validieren von Daten
@@ -3372,6 +3328,8 @@ die Liste mit den (JSON-)Posts zurückkommen
                      // ^--- ok
   
   ```
+* 👉 Zod ist nicht React-spezifisch, das könnt ihr aber in React verwenden
+  * auch mit Zustand, React Hook Form und anderen Bibliotheken, in denen ihr "nicht vertrauenswürdige" Daten habt.
 ---
 ### Zod: Ableiten des TypeScript-Typen  
 * Den TypeScript-Typen müssen wir gar nicht selber schreiben, dass kan zod für uns machen:
@@ -3390,7 +3348,7 @@ die Liste mit den (JSON-)Posts zurückkommen
   * Wenn Du den Post "Something to remember when learning new tech" (ID: "P5") öffnest, sollte eine Fehlermeldung erscheinen, weil dessen Titel länger als 40 Zeichen ist
   * Das dauert eine Zeit, weil TanStack Query bei einem Fehler automatisch mehrere weitere versuche unternimmt, die Daten zu laden
   * Erst danach wird dann die Fehlermeldung gerendert
-* Lösung: `steps/32_zod`
+* Lösung: `material/32_zod`
 
 
 
@@ -3491,6 +3449,7 @@ manuell neu auszuführen
 
 ---
 ## Suspense
+<!-- .slide: id="t-suspense" -->
 
 * Suspense ist ein relativ neuer Mechanismus in React, um das Arbeiten mit asynchronem Code (insb. Data Fetching) zu vereinfachen
 * Suspense unterbricht das Rendern, wenn eine Komponente wegen noch fehlender Daten nicht gerendert werden kann
@@ -3634,51 +3593,8 @@ manuell neu auszuführen
   * Du kannst Du Lade-Zeiten mit `?slow=TIMEOUT_IN_MS` in den URLs verzögern
   * Am besten funktioniert Suspense, wenn Du erst die Blogliste aufrufst, und dort dann einen BlogPost anklickst
 * Lösung: `steps/45_suspense_02`
----
-## Ausblick: Routing mit Data Fetching
-
-* Der React Router ist ebenfalls in der Lage, das Laden von Daten für eine Route zu koordinieren
-* Das geht mit oder ohne Suspense
-* Dazu gebt ihr bei der Routen-Definition einer `loader`-Funktion an
-* Dieser Funktion werden die Routen-Parameter übergeben.
-* Sie liefert ein Promise mit den zu ladenen Daten zurück
-* ```typescript
-  <Route path="/post/:postId" 
-    loader={ async (params) => { /* fetch ... */ } }
-    component={PostPage} 
-  } />
-  ```
-* Auf die gelesenen Daten könnt ihr dann in der Komponente mit `useLoaderData` zugreifen:
-* ```typescript
-  function PostPage() {
-    const post = useLoaderData(); // Rückgabewert der loader-Funktion
-  }
-  ```
-* Um Caching etc. zu verwenden könnt ihr in der `loader`-Funktion auch  den `QueryClient` von TanStack Query verwenden, um die Daten zu verwenden
-* Ist das eine gute Idee? 🤔
 
 
-<!-- 
-
-## Übung: Die Blog-Anwendung mit TanStack Query
-
-* _Vervollständige den Query zum Laden und Speichern mit TanStack Query_
-* Backend starten
-* Das Backend ist bereits fertig. Du kannst es starten mit:
-* ```
-cd blog-example/backend-rest
-npm install (nur, falls noch nicht gemacht)
-npm start
-```
-* Danach sollte unter [http://localhost:7000/posts](http://localhost:7000/posts) 
-die Liste mit den (JSON-)Posts zurückkommen
-* Schritte:
-* Kopiere `index.js` und `App.js` aus `material/4-remote-query` in dein `src`-Verzeichnis
-* In `App.js` findest Du TODOs mit weiteren Hinweisen
-* Mögliche Lösung findest Du in `steps/4-remote-query`
-* Wenn Du fertig bist, bitte "Hand heben" in Teams 🙋‍♀️
-
---- -->    
   </textarea
           >
         </section>
