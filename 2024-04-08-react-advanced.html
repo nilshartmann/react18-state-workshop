@@ -986,7 +986,8 @@ render(
 * Ausführen kannst Du die Tests mit `npm test`
   * Dieser Prozess läuft "ewig" und führt die Tests automatisch beim Speichern aus
 * Alternativ kannst Du die Tests auch in IDEA ausführen
-* Lösung: `material
+* Lösung: `20_context/material/03_test/PostEditorTest.test.tsx`
+
 * Wenn Du fertig bist, bitte "Hand heben" 🙋‍
           </textarea>
         </section>
@@ -1626,6 +1627,7 @@ render(
   * Doku: https://docs.pmnd.rs/zustand/getting-started/introduction
 * Bitte arbeite im Verzeichnis `30_zustand_intro/workspace`
   * Dort `npm install` und `npm start` ausführen (alten npm-Prozess ggf. beenden)
+  * Im zweiten Terminal `npm run tsc` ausführen, um den TypeScript TypeChecker auszuführen und TS-Fehlermeldungen zu sehen.
 * Der Stand dort entspricht dem "fertigen" Stand aus dem Context-Teil mit fertigem `NotificationContext`
 * Stelle `NotificationContext` auf einen Zustand-Store um (Verhalten soll gleich bleiben) und verwende den Store dann in `NotificationApp`
 *   TODOs findest Du in `NotificationContext.tsx` und `NotificationApp.tsx`
@@ -2037,12 +2039,15 @@ const olderPersons = persons.map( p => {
 ---
 ### Übung: Immutability mit plain JavaScript
 * Im Verzeichnis `40_immutability/workspace/src` findest Du die Datei `updateShoppingCart.ts`
+  * Dort bitte `npm install` ausführen
+  *  `npm run tsc` ausführen, um TypeScript Fehler zu erhalten
 * Diese Datei enthält eine Funktion, die aber noch nicht implementiert ist 😢...
 * Die Datei enthält aber Anforderungen an die Funktion 🫣
 * ...die Du mit JavaScript- bzw. TypeScript-Mitteln umsetzen musst! 😱
-* Um zu Überprüfen, ob deine Implementierung korrekt ist, kannst Du die Tests in `src/__test/updateShoppingCart.test.ts` ausführen
+* Um zu Überprüfen, ob deine Implementierung korrekt ist, kannst Du die Tests in `40_immutability/workspace/src/__test__/updateShoppingCart.test.ts` ausführen
 * Bei Problemen oder Fragen melde dich jederzeit!
 * Eine mögliche Lösung findest Du in `40_immutability/material/20_es6/solution`
+* Wenn Du fertig bist, bitte Hand heben ✋
           </textarea>
         </section>
 
@@ -2172,7 +2177,10 @@ function changeName(userId, newName) {
   * oder Du startest in `40_immutability/workspace/src/updateShoppingCartImmer.ts`
 * Auch hier gibt es Tests zur Kontrolle: `src/__test__/updateShoppingCartImmer.test.ts`
   * Da die Fachlichkeit der beiden Implementierung identisch sein soll, sind auch die Tests identisch
+* TypeScript könnt ihr ausführen mit:
+  * `npm run tsc`
 * Bei Problemen und Fragen, melde dich.
+
 * Eine Lösung findest Du in `40_immutability/material/25_immer/solution`
 * Wenn Du fertig bist, bitte Hand heben ✋
   </textarea
@@ -2492,9 +2500,12 @@ function changeName(userId, newName) {
   * bestehende Dateien ggf. überschreiben
 * In `50_zustand_advanced/workspace` ggf. `npm install` und dann `npm start` ausführen
   * Noch laufende npm-Prozesse vorher abbrechen
+  * TypeScript könnt ihr ausführen mit: `npm run tsc`
 * Aufgaben:
-  1. Stelle `useShoppingCartStore` in `shopingCartSlice.ts` auf einen Slice bzw. `StateCreator` um
-  2. Erzeuge den "Bounded Store" in `appStore.ts`
+  1. Fertigen den "Bounded Store" in Workspace kopieren:
+    * `50_zustand_advanced/material/15_slices/10_solution/stores/appStore.ts`
+            in euer `workspace/src/stores`-Verzeichnis kopieren
+  2. Stelle `useShoppingCartStore` in `shopingCartSlice.ts` auf einen Slice bzw. `StateCreator` um
   3. Vervollständige in `ShoppingCartApp.tsx` die `ProductList` und `Product`-Komponenten
 * Du findest in allen Dateien auch entsprechende TODOs
 * Bei Fragen und Problemen melde dich jederzeit
