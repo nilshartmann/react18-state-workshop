@@ -1,23 +1,25 @@
 import Container from "./Container.tsx";
+import NotificationContextProvider, {
+  useNotificationContext,
+} from "./NotificationContext.tsx";
 
 export default function NotificationApp() {
-  // TODO:
-  //  - Füge deinen NotificationContextProvider als Top-Level-Komponente ein
-  //  - Vervollständige dann die NotificationBar, -Trigger und -Status-Komponente
   return (
-    <Container title={"App"}>
-      <div className={"SameSizeFlex"}>
-        <NotificationBar />
-        <NotificationTrigger />
-        <NotificationStatus />
-      </div>
-    </Container>
+    <NotificationContextProvider>
+      <Container title={"App"}>
+        <div className={"SameSizeFlex"}>
+          <NotificationBar />
+          <NotificationTrigger />
+          <NotificationStatus />
+        </div>
+      </Container>
+    </NotificationContextProvider>
   );
 }
 
 function NotificationBar() {
   // TODO: Lies die aktuelle Nachricht aus dem NotificationContext uns zeige sie unten an
-  const message = "";
+  const { message } = useNotificationContext();
 
   return (
     <Container title={"NotificationBar"}>
@@ -30,16 +32,27 @@ function NotificationTrigger() {
   // TODO: Implementiere 'onClick'-Handler für die Button, so dass
   //       die Button die im Label beschriebenen Aktionen im Context
   //       durchführen
+  const context = useNotificationContext();
   return (
     <Container title={"NotificationTrigger"}>
       <div className={"Flex"}>
-        <button>Set 'not_found' notification</button>
-        <button>Set 'invalid_user_id' notification</button>
-        <button>Clear notification</button>
+        <button onClick={() => context.showNotification("not_found")}>
+          Set 'not_found' notification
+        </button>
+        <button onClick={() => context.showNotification("invalid_user_id")}>
+          Set 'invalid_user_id' notification
+        </button>
+        <button onClick={() => context.showNotification(null)}>
+          Clear notification
+        </button>
       </div>
       <div>
-        <button>Set Language to 'de'</button>
-        <button>Set Language to 'en'</button>
+        <button onClick={() => context.setLanguage("de")}>
+          Set Language to 'de'
+        </button>
+        <button onClick={() => context.setLanguage("en")}>
+          Set Language to 'en'
+        </button>
       </div>
     </Container>
   );
@@ -51,7 +64,7 @@ function NotificationStatus() {
   //     und zeige dann an, dass eine Nachricht gesetzt ist, bzw. das keine
   //     Nachricht gesetzt ist.
   //     Also nur die Info ob Nachricht (nicht) gesetzt ist, aber nicht die eigentliche Nachricht
-  const hasNotification = false;
+  const hasNotification = useNotificationContext().messageId !== null;
 
   return (
     <Container title={"NotificationStatus"}>

@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNotificationContext } from "./NotificationContext.tsx";
+import { useErrorBoundary } from "react-error-boundary";
 
 type BlogPost = {
   title: string;
@@ -14,11 +16,56 @@ type PostEditorProps = {
   onSavePost: (post: NewBlogPost) => void;
 };
 
+function useCurrentLocale() {
+  const x = useState();
+  return x;
+}
+
+function useMessageGenerator() {
+  const currentLocale = useCurrentLocale();
+  return function messageGenerator(messageId: string) {
+    /* ... */
+  };
+}
+
+// Custom Hook
+function useMaxLengthState(initialValue: string, maxLength: number) {
+  const [myState, setMyState] = React.useState(initialValue);
+  const messageGenerator = useMessageGenerator();
+
+  function changeMyState(newState: string) {
+    setMyState(newState);
+  }
+
+  if (myState.length > maxLength) {
+    return [myState, changeMyState, messageGenerator("too long")] as const;
+  }
+
+  return [myState, changeMyState, null] as const;
+}
+
+// Hook-Funktion
+//   to hook => einhaken
+//
+//  1.  "Hello World"     |  setTitle
+//  2.  "Abc"             |  setBody
+//
+//  Einschränkungen:
+//    - Hook-Funktion nur in Funktionskomponenten und in anderen Hook-Funktion
+//    - immer in gleicher Anzahl und Reihenfolge ausführen!
+//  "Rules of hook": https://legacy.reactjs.org/docs/hooks-rules.html
 export default function PostEditor({ onSavePost }: PostEditorProps) {
-  const [title, setTitle] = React.useState("");
-  const [body, setBody] = React.useState("");
+  const [title, setTitle, errorMessage] = useMaxLengthState("", 5); // "Hello World"
+  const [body, setBody] = React.useState(""); // "Abc"
+  const eb = useErrorBoundary();
+
+  // OK:
+  // const ctx = useNotificationContext();
 
   function savePost(post: NewBlogPost) {
+    // VERBOTEN:
+    // useNotificationContext()
+
     onSavePost(post);
   }
 
@@ -36,11 +83,7 @@ export default function PostEditor({ onSavePost }: PostEditorProps) {
           onChange={(e) => setTitle(e.currentTarget.value)}
         />
       </label>
-      {title ? (
-        <Message type="info" msg="Title correctly filled"></Message>
-      ) : (
-        <Message type="error" msg="Please enter a title"></Message>
-      )}
+      {/*<p>{errorMessage}</p>*/}
 
       <label>
         Body
@@ -58,6 +101,8 @@ export default function PostEditor({ onSavePost }: PostEditorProps) {
       <button
         disabled={clearDisabled}
         onClick={() => {
+          eb.showBoundary("Das Eingabefeld konnte nicht gelöscht werden.");
+
           setTitle("");
           setBody("");
         }}

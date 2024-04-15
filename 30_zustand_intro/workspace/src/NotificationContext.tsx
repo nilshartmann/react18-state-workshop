@@ -1,10 +1,13 @@
-import { createContext, ReactNode, useContext, useState } from "react";
-import { invariant } from "@epic-web/invariant";
+import { create } from "zustand";
+import { useShallow } from "zustand/react/shallow";
 
 type Lang = "en" | "de";
 type MessageId = "not_found" | "invalid_user_id";
 type Messages = Record<MessageId, string>;
 
+// Annahme: die Messages ändern sich zur Laufzeit nicht
+//  typischerweise werden diese aus einer i18n-Datei pro Sprache gelesen
+//  - Dann ändert sich die Sprache zur Laufzeit, aber nicht die Messages
 const messages_de: Messages = {
   not_found: "Nicht gefunden",
   invalid_user_id: "User-Id ungültig",
@@ -41,59 +44,94 @@ const messages: Record<Lang, Messages> = {
 // ================================================================================================================
 
 // Sieht die Struktur des Zustand-Stores genauso aus wie der Context? 🤔
-type INotificationContext = {
-  messageId: MessageId | null;
-  message: string | null;
-  lang: Lang;
+
+// entspricht weitgehend im INotificationContext,
+//  nur message fehlt hier; dafür verwenden wir einen Selektor
+type INotificationStore = {
+  readonly messageId: MessageId | null;
+  readonly lang: Lang;
+  readonly name: string;
 
   showNotification(messageId: MessageId | null): void;
   setLanguage(lang: Lang): void;
 };
 
-// Das kannst Du alles entfernen, wenn Du den Zustand Store eingefügt hast.
-//
+export const useNotificationStore = create<INotificationStore>()((set) => ({
+  messageId: null,
+  lang: "en",
+  name: "susi",
 
-const NotificationContext = createContext<INotificationContext | null>(null);
-
-type NotificationContextProviderProps = {
-  children?: ReactNode;
-};
-export default function NotificationContextProvider({
-  children,
-}: NotificationContextProviderProps) {
-  const [messageId, setMessageId] = useState<MessageId | null>(null);
-  const [language, setLanguage] = useState<Lang>("en");
-
-  const showNotification = (newMessageId: MessageId | null) => {
-    setMessageId(newMessageId);
-  };
-
-  const message = messageId ? messages[language][messageId] : null;
-
-  return (
-    <NotificationContext.Provider
-      value={{
-        messageId,
-        message,
-        lang: language,
-        showNotification,
-        setLanguage,
-      }}
-    >
-      {children}
-    </NotificationContext.Provider>
-  );
-}
+  showNotification(messageId) {
+    set({ messageId });
+  },
+  setLanguage(newLanguage) {
+    set({ lang: newLanguage });
+  },
+}));
 
 // Machen Custom Hooks mit Zustand Sinn?
 // Falls ja: welche? Falls nein: warum nicht?
-export function useNotificationContext(): INotificationContext {
-  const ctx = useContext(NotificationContext);
+export function useNotificationMessage(): string | null {
+  const langAndMessageId3 = useNotificationStore((state) => {
+    return [state.lang, state.messageId];
+  });
 
-  invariant(
-    ctx !== null,
-    "No NotificationContext found. Please add NotificationContextProvider.",
+  const langAndMessageId = useNotificationStore(
+    useShallow((state) => {
+      return {
+        lang: state.lang,
+        messageId: state.messageId,
+      };
+    }),
   );
 
-  return ctx;
+  const langAndMessageId2 = useNotificationStore((state) => ({
+    lang: state.lang,
+    messageId: state.messageId,
+  }));
+
+  const lang = useNotificationStore((state) => state.lang);
+  const messageId = useNotificationStore((state) => state.messageId);
+
+  // de -> en NICHT
+  // en -> de NICHT
+  // de -> null RENDER
+  // null -> null  NICHT NEU GERENDERT
+  // null -> en RENDER
+  const isMessageSet = useNotificationStore(
+    (state) => state.messageId !== null,
+  );
+
+  // de -> en
+  // en -> de
+  // de -> null
+  // de -> de  NICHT
+  // en -> en NICHT
+  // null -> de
+  // const messageId2 = useNotificationStore((state) => state.messageId);
+  // const isMessageSet2 = messageId2 !== null;
+
+  // if (!messageId) {
+  //   return null;
+  // }
+
+  return messages[lang][messageId];
+
+  // return useNotificationStore(state => {
+  //   const messageId = state.messageId;
+  //   const lang  = state.lang;
+  // })
+  //
+}
+
+export function useNotificationLanguage() {
+  const lang = useNotificationStore((state) => state.lang);
+  return lang;
+}
+
+export function useNotificationActions() {
+  const showNotification = useNotificationStore((s) => s.showNotification);
+  const setLanguage = useNotificationStore((s) => s.setLanguage);
+
+  return { showNotification, setLanguage };
 }

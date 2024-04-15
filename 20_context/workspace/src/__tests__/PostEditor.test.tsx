@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import _userEvent from "@testing-library/user-event";
 import PostEditor, { NewBlogPost } from "../PostEditor";
 import { jest } from "@jest/globals";
+import NotificationContextProvider from "../NotificationContext.tsx";
 
 type OnSaveFn = (newBlogPost: NewBlogPost) => void;
 
@@ -21,19 +22,11 @@ type OnSaveFn = (newBlogPost: NewBlogPost) => void;
 const setup = (onSavePost: OnSaveFn = jest.fn()) => {
   const user = _userEvent.setup();
 
-  // todo:
-  //  PostEditor-Komponente rendern
-  //    dabei onSavePost-Property setzen
+  render(<PostEditor onSavePost={onSavePost} />);
 
-  const titleInput = screen.getByTestId(
-    "todo: richtige getBy-Funktion verwenden.",
-  );
-  const bodyInput = screen.getByTestId(
-    "todo: richtige getBy-Funktion verwenden.",
-  );
-  const saveButton = screen.getByTestId(
-    "todo: richtige getBy-Funktion verwenden.",
-  );
+  const titleInput = screen.getByLabelText("Title");
+  const bodyInput = screen.getByLabelText("Body");
+  const saveButton = screen.getByRole("button", { name: "Save Post" });
 
   return {
     user,
@@ -46,6 +39,23 @@ const setup = (onSavePost: OnSaveFn = jest.fn()) => {
   } as const;
 };
 
+test("bla", () => {
+  const savePostMockFn = jest.fn();
+  render(
+    <NotificationContextProvider>
+      <PostEditor onSavePost={savePostMockFn} />
+    </NotificationContextProvider>,
+  );
+
+  //
+  //
+
+  expect(savePostMockFn).toHaveBeenCalledWith({
+    title: "Neuer BlogPost",
+    body: "...",
+  });
+});
+
 test("add post button callback", async () => {
   const { user, titleInput, bodyInput, saveButton, onSavePost } = setup();
 
@@ -56,6 +66,18 @@ test("add post button callback", async () => {
   //    3. Stelle sicher, dass 'onSavePost' mit den eingegebenen Werten
   //       aufgerufen wurde
   //
+
+  // enter form
+  await user.type(titleInput, "New Title");
+  await user.type(bodyInput, "New Body");
+
+  // click save
+  expect(saveButton).toBeEnabled();
+  await user.click(saveButton);
+  expect(onSavePost).toHaveBeenCalledWith({
+    title: "New Title",
+    body: "New Body",
+  });
 });
 
 test("save button enablement", async () => {
@@ -67,4 +89,22 @@ test("save button enablement", async () => {
   // gib dann erst etwas in das title, dann in das body-Feld etwas ein
   // stelle danach sicher, dass der Save-Button nun enabled ist
   //   (der Save-Button ist nur enabled, wenn BEIDE Felder ausgefüllt sind)
+
+  // Save Button should be disabled
+  expect(saveButton).toBeDisabled();
+  expect(titleInput).toBeEnabled();
+
+  // enter Title...
+  await user.type(titleInput, "New Title");
+
+  expect(titleInput).toHaveValue("New Title");
+
+  // should still be disabled
+  expect(saveButton).toBeDisabled();
+
+  // enter body
+  await user.type(bodyInput, "New Body");
+
+  // ...now the button should be enabled
+  expect(saveButton).toBeEnabled();
 });

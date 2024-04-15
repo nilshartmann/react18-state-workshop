@@ -44,7 +44,19 @@ const messages: Record<Lang, Messages> = {
 //  4. Verwende den Context in 'NotificationApp.tsx' (weitere TODOs siehe dort)
 
 // Beschreibe hier den TypeScript-Typen für unseren Notification Kontext
-type INotificationContext = {};
+type INotificationContext = {
+  messageId: MessageId | null;
+  message: string | null;
+  lang: Lang;
+
+  showNotification(messageId: MessageId | null): void;
+  setLanguage(lang: Lang): void;
+};
+
+//
+const NotificationContext = createContext<INotificationContext | null>(null);
+// NotificationContext.Provider
+// NotificationContext.Consumer
 
 type NotificationContextProviderProps = {
   children?: ReactNode;
@@ -59,11 +71,39 @@ export default function NotificationContextProvider({
   //  - Als Kind-Element von NotificationContext.Provider musst Du das 'children' Property übergeben, das
   //    an diese (NotificationContextProvider) Komponente übergeben wurde
 
-  return children;
+  const [messageId, setMessageId] = useState<MessageId | null>(null);
+  const [language, setLanguage] = useState<Lang>("en");
+
+  const showNotification = (newMessageId: MessageId | null) => {
+    setMessageId(newMessageId);
+  };
+
+  const message = messageId ? messages[language][messageId] : null;
+
+  return (
+    <NotificationContext.Provider
+      value={{
+        messageId,
+        message,
+        lang: language,
+        showNotification,
+        setLanguage,
+      }}
+    >
+      {children}
+    </NotificationContext.Provider>
+  );
 }
 
-export function useNotificationContext() {
+export function useNotificationContext(): INotificationContext {
   // Implementiere diesen Custom Hook, so dass dieser in jedem Fall einen INotificationContext
   // zurückliefert (oder throw new Error("..."), falls kein Context gesetzt ist)
-  //
+  const ctx = useContext(NotificationContext);
+
+  invariant(
+    ctx !== null,
+    "No NotificationContext found. Please add NotificationContextProvider.",
+  );
+
+  return ctx;
 }

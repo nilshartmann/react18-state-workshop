@@ -1,8 +1,6 @@
 import { IShoppingCartItem } from "../shopping-cart.types.ts";
 import { create, StateCreator } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { ProductSlice } from "./productSlice.ts";
-import { useAppStore } from "./appStore.ts";
 
 // "GENERISCHER STORE":
 // type ListStore<I> = {
@@ -31,27 +29,21 @@ import { useAppStore } from "./appStore.ts";
 // useProductStore.getState().add({ price: 3 });
 // useProductStore.getState().add({ firstname: "Noe" });
 
-export type ShoppingCartSlice = {
-  shoppingCart: {
-    items: IShoppingCartItem[];
-    // Aufgabe: wenn das Item bereits vorhanden ist,
-    //   soll es erhöht werden! Sonst neu hinzufügen!
-    //   Identisch zu updateQuantity(productId, 1)
-
-    addItem(productId: string): void;
-    // Wenn productId nicht in den Items vorhanden ist => passiert nichts
-    // Wenn productId vorhanden ist,
-    //   amount kann +number oder -number sein
-    //   Wenn berechneter Wert <1, dann Produkt entfernen
-    //  --> Logik entspricht unserer updateShoppingCart-Funktion aus der letzten Übung!
-    //
-    updateItemQuantity(productId: string, amount: number): void;
-  };
+type ShoppingCartStore = {
+  username: string;
+  items: IShoppingCartItem[];
+  // Aufgabe: wenn das Item bereits vorhanden ist,
+  //   soll es erhöht werden! Sonst neu hinzufügen!
+  //   Identisch zu updateQuantity(productId, 1)
+  addItem(productId: string): void;
+  // Wenn productId nicht in den Items vorhanden ist => passiert nichts
+  // Wenn productId vorhanden ist,
+  //   amount kann +number oder -number sein
+  //   Wenn berechneter Wert <1, dann Produkt entfernen
+  //  --> Logik entspricht unserer updateShoppingCart-Funktion aus der letzten Übung!
+  //
+  updateItemQuantity(productId: string, amount: number): void;
 };
-
-// function Beispiel() {
-//   const { addItem, updateItemQuantity } = useAppStore((s) => s.actions);
-// }
 
 const initialItems: IShoppingCartItem[] = [
   { productId: "P1", quantity: 2 },
@@ -72,34 +64,29 @@ const initialItems: IShoppingCartItem[] = [
 //       Store verwenden.
 //       - Weitere TODOs findest Du dort
 
-export const createShoppingCartSlice: StateCreator<
-  ShoppingCartSlice & ProductSlice,
-  [["zustand/immer", never], never],
-  [],
-  ShoppingCartSlice
-> = (set, get) => ({
-  shoppingCart: {
-    items: [],
+export const useShoppingCartStore = create<ShoppingCartStore>()(
+  immer((set, get) => ({
+    items: initialItems,
+    username: "Klaus",
+
     addItem(productId: string) {
-      get().shoppingCart.updateItemQuantity(productId, 1);
+      get().updateItemQuantity(productId, 1);
     },
+
     updateItemQuantity(productId: string, amount: number) {
-      // draft is now  WritableDraft thanks to immer middleware
-      set(({ shoppingCart }) => {
+      set((draft) => {
         if (amount === 0) {
           return;
         }
 
-        const existingItem = shoppingCart.items.find(
-          (p) => p.productId === productId,
-        );
+        const existingItem = draft.items.find((p) => p.productId === productId);
         if (!existingItem) {
           if (amount < 1) {
             // item is not present, amount is < 1 => nothing to do
             return;
           }
 
-          shoppingCart.items.push({
+          draft.items.push({
             productId,
             quantity: amount,
           });
@@ -109,15 +96,23 @@ export const createShoppingCartSlice: StateCreator<
         // item is present
         const newQuantity = existingItem.quantity + amount;
         if (newQuantity < 1) {
-          const ix = shoppingCart.items.findIndex(
-            (p) => p.productId === productId,
-          );
-          shoppingCart.items.splice(ix, 1);
+          const ix = draft.items.findIndex((p) => p.productId === productId);
+          draft.items.splice(ix, 1);
           return;
         }
 
         existingItem.quantity = newQuantity;
       });
     },
-  },
-});
+  })),
+);
+
+type ProductStore = {
+  products: any,
+
+}
+export const useProductStore = create<ProductStore>()( (get, set) => ({
+
+}))
+
+

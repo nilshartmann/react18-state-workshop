@@ -5,7 +5,6 @@ export type IShoppingCartItem = {
 };
 
 export type IShoppingCart = {
-  username: string;
   items: IShoppingCartItem[];
 };
 

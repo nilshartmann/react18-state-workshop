@@ -1,10 +1,7 @@
 import { useContext, useState } from "react";
 import Container from "./Container";
 import TwoColumns from "./TwoColumns";
-import CounterContextProvider, {
-  CounterContext,
-  useCounterContext,
-} from "./CounterContext.tsx";
+import { useCounterStore } from "./CounterContext.tsx";
 
 function Main() {
   // was wird neu gerendert wenn sich der lokale Zustand ändert?
@@ -18,6 +15,7 @@ function Main() {
       </div>
       <TwoColumns>
         <CounterDisplay />
+        <NumberDisplay />
       </TwoColumns>
     </Container>
   );
@@ -25,42 +23,37 @@ function Main() {
 
 function CounterDisplay() {
   // Context verwenden
-  const counterContext = useCounterContext();
+  // const counterContext = useCounterContext();
+  const increaseCounter = useCounterStore(
+    // Selektor-Funktion
+    (currentStore) => currentStore.increaseCounter,
+  );
 
   return (
-    <Container title="Counter Display">
-      <h1>Counter</h1>
-      <NumberDisplay
-        label="Current Counter value"
-        value={counterContext.counter}
-      />
-      <button onClick={() => counterContext.increaseCounter()}>
-        Increase!
-      </button>
-    </Container>
+    <>
+      <Container title="Counter Display">
+        <h1>Counter</h1>
+        <button onClick={() => increaseCounter()}>Increase!</button>
+      </Container>
+    </>
   );
 }
 
-type NumberDisplayProps = {
-  label: string;
-  value: number;
-};
-function NumberDisplay({ label, value }: NumberDisplayProps) {
+function NumberDisplay() {
+  // const counterStore = useCounterStore();
+  const counter = useCounterStore((s) => s.counter);
+  // const counterContext = useCounterContext();
   return (
     <Container title="NumberDisplay">
-      <p>
-        {label}: {value}
-      </p>
+      <p>current value: {counter}</p>
     </Container>
   );
 }
 
 export default function App() {
   return (
-    <CounterContextProvider>
-      <Container title="Root">
-        <Main />
-      </Container>
-    </CounterContextProvider>
+    <Container title="Root">
+      <Main />
+    </Container>
   );
 }

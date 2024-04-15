@@ -6,8 +6,6 @@
 //  Diese Funktion fügt ein neues Produkt zu einem Warenkorb hinzu,
 //   entfernt ein Produkt oder aktualisiert dessen Anzahl im Warenkorb
 //
-// - zurückgeliefert wird
-//
 //  - amount kann eine positive oder negative Zahl sein
 //     - wenn positiv wird die Anzahl im Warenkorb erhöht
 //     - wenn negativ wird die Anzahl im Warenkorb verringert
@@ -34,10 +32,6 @@
 //      - wenn die Cart nicht verändert wird => Cart unverändert zurückgeben!
 //      - Items die in der Cart nicht verändert werden => unverändert zurückgeben
 //
-//  KONTROLLE / TEST
-//   - Wenn Du alles korrekt implementiert hast, sollten die Tests in '__test__/updateShoppingCart.test.ts'
-//       alle "grün" werden
-//
 //
 
 type IShoppingCartItem = {
@@ -55,6 +49,59 @@ export function updateShoppingCart(
   productId: string,
   amount: number,
 ): IShoppingCart {
-  // todo!
-  return cart;
+  // Immer
+
+  if (amount === 0) {
+    return cart;
+  }
+
+  const existingItem = cart.items.find((p) => p.productId === productId);
+  if (!existingItem) {
+    if (amount < 1) {
+      // item is not present, amount is negative => nothing to do
+      return cart;
+    }
+
+    // add item to shopping cart
+    return {
+      ...cart,
+      items: [
+        ...cart.items,
+        {
+          productId,
+          quantity: amount,
+        },
+      ],
+    };
+  }
+
+  // item is present
+  const newQuantity = existingItem.quantity + amount;
+  if (newQuantity < 1) {
+    // item has to be removed, because new amout is less than 1
+    return {
+      ...cart,
+      items: cart.items.filter((p) => p.productId !== productId),
+      // items: cart.items.reduce( (prev, curr) => {
+      //   if (curr.productId === productId) {
+      //     return prev;
+      //   }
+      //   prev.push(curr)
+      //   return curr;
+      // }, [] as IShoppingCartItem[])
+    };
+  }
+
+  // update existing shopping cart => no new item neccessary, just update the existing one
+  return {
+    ...cart,
+    items: cart.items.map((p) =>
+      p.productId === productId
+        ? {
+            productId,
+            quantity: newQuantity,
+          }
+        : p,
+    ),
+  };
 }

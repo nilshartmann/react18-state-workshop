@@ -1,26 +1,27 @@
 import Container from "./Container.tsx";
-import NotificationContextProvider, {
-  useNotificationContext,
+import {
+  useNotificationActions,
+  useNotificationMessage,
+  useNotificationStore,
 } from "./NotificationContext.tsx";
+import { useShallow } from "zustand/react/shallow";
 
 export default function NotificationApp() {
   // todo: Den NotificationContextProvider entfernen (ersatzlos streichen)
   return (
-    <NotificationContextProvider>
-      <Container title={"App"}>
-        <div className={"SameSizeFlex"}>
-          <NotificationBar />
-          <NotificationTrigger />
-          <NotificationStatus />
-        </div>
-      </Container>
-    </NotificationContextProvider>
+    <Container title={"App"}>
+      <div className={"SameSizeFlex"}>
+        <NotificationBar />
+        <NotificationTrigger />
+        <NotificationStatus />
+      </div>
+    </Container>
   );
 }
 
 function NotificationBar() {
   // TODO: Lies die aktuelle Nachricht aus dem Store uns zeige sie unten an
-  const { message } = useNotificationContext();
+  const message = useNotificationMessage();
 
   return (
     <Container title={"NotificationBar"}>
@@ -30,37 +31,51 @@ function NotificationBar() {
 }
 
 function NotificationTrigger() {
-  // TODO: Implementiere 'onClick'-Handler für die Button, so dass
-  //       die Buttons jeweils die entsprechende Action im Zustand Store ausführen
-  //       - Achtung! Diese Komponente sollte sich nur ändern, wenn sich eine der Actions
-  //         ändert. (Also faktisch nie, denn die Actions ändern sich ja nicht...)
-  //         - Die Komponente soll sich NICHT neu rendern, wenn eine Message oder Sprache gesetzt
-  //           oder geändert wird
-  //         - was musst Du dafür machen bzw. beachten?
-  //       - Die Anzahl der Renderings zeigt die Container-Komponente an
-  //           (ggf. showRenderings = true setzen in Container.tsx)
+  // const store = useNotificationStore( s => s);
+  // store.messageId = "not_found"
+  // Object.is(oldSelectorValue, newSelectorValue);
+  // // oldSelectorValue === newSelectorValue
 
-  const context = useNotificationContext();
+  // NEIN!!!!!!!!!!!!!
+  // const store = useNotificationStore();
+  //
+  // JA !!!!!!!!!!!!!!!!
+  // const showNotification = useNotificationStore((s) => s.showNotification);
+  // const setLanguage = useNotificationStore((s) => s.setLanguage);
+  //
+  // JA!!!!!!!!! ABER...........
+  // const { showNotification, setLanguage } = useNotificationActions()
+  //
+  // NEIN!!!!!!!!!!!!!!!!!!!!!!!
+  // const { showNotification, setLanguage } = useNotificationStore((s) => ({
+  //   showNotification: s.showNotification,
+  //   setLanguage: s.setLanguage,
+  // }));
+  //
+  // // JA!!!! ABER !!!!!!!!!!!!!!!!!
+  const { showNotification, setLanguage } = useNotificationStore(
+    useShallow((s) => ({
+      showNotification: s.showNotification,
+      setLanguage: s.setLanguage,
+    })),
+  );
+
   return (
     <Container title={"NotificationTrigger"}>
       <div className={"Flex"}>
-        <button onClick={() => context.showNotification("not_found")}>
+        <button onClick={() => showNotification("not_found")}>
           Set 'not_found' notification
         </button>
-        <button onClick={() => context.showNotification("invalid_user_id")}>
+        <button onClick={() => showNotification("invalid_user_id")}>
           Set 'invalid_user_id' notification
         </button>
-        <button onClick={() => context.showNotification(null)}>
+        <button onClick={() => showNotification(null)}>
           Clear notification
         </button>
       </div>
       <div>
-        <button onClick={() => context.setLanguage("de")}>
-          Set Language to 'de'
-        </button>
-        <button onClick={() => context.setLanguage("en")}>
-          Set Language to 'en'
-        </button>
+        <button onClick={() => setLanguage("de")}>Set Language to 'de'</button>
+        <button onClick={() => setLanguage("en")}>Set Language to 'en'</button>
       </div>
     </Container>
   );
@@ -76,8 +91,14 @@ function NotificationStatus() {
   //    - wenn keine Message gesetzt war und nun eine ist => neu rendern, damit die Status-Anzeige aktualisiert wird
   //  Die Anzahl der Renderings zeigt die Container-Komponente an
   //   (ggf. showRenderings = true setzen in Container.tsx)
-
-  const hasNotification = false;
+  const hasNotification = useNotificationStore(
+    (state) => state.messageId !== null,
+  );
+  // 🤔🤔🤔🤔🤔
+  //  - warum nicht so:
+  // const messageId = useNotificationStore((state) => state.messageId);
+  // const hasNotification2 = messageId !== null;
+  // 🤔🤔🤔🤔🤔
 
   return (
     <Container title={"NotificationStatus"}>
